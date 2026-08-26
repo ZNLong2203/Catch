@@ -1,0 +1,31 @@
+{
+  "name": "catch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Catch — cham ky thuat boi tu video, tro giang cho lop pho cap boi",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "node .next/standalone/server.js",
+    "postbuild": "cp -R .next/static .next/standalone/.next/ && cp -R public .next/standalone/ || true",
+    "typecheck": "tsc --noEmit",
+    "probe": "node private/probe/probe.mjs",
+    "test": "node --test --experimental-strip-types --import ./test/register.mjs test/*.test.ts",
+    "eval": "node private/probe/eval.mjs"
+  },
+  "dependencies": {
+    "@google/genai": "^2.19.0",
+    "next": "^16.3.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.0"
+  }
+}

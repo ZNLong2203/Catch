@@ -1,0 +1,103 @@
+# Chạy và triển khai
+
+## Chạy tại máy
+
+```bash
+npm install --ignore-scripts     # ← chú ý cờ này, xem "Hai cái bẫy" bên dưới
+cp .env.local.example .env.local # rồi điền khoá Gemini
+npm run dev
+```
+
+## Chạy thử bản production tại máy
+
+```bash
+npm run build && npm run postbuild
+GEMINI_API_KEY=xxx node .next/standalone/server.js
+```
+
+Phải truyền khoá vào dòng lệnh — bản standalone **không đọc `.env.local`**. Xem bẫy số 2.
+
+## Phép thử sống chết
+
+```bash
+npm run probe                        # 7 video công khai, model mặc định
+npm run probe gemini-3.6-flash       # đổi model
+npm run probe gemini-3.5-flash 3     # chỉ chạy video số 3
+```
+
+Script đọc khoá thẳng từ `.env.local`. Xem `private/KILL-TEST.md`.
+
+## Hai cái bẫy đã vấp, ngày 26/08
+
+**1. `npm install` trần làm hỏng cả cây phụ thuộc.**
+
+`@google/genai` có script `prepare` chạy lỗi trên máy này. npm dừng giữa chừng, và
+những gói xếp sau nó — `server-only`, `tailwindcss` — **không được cài**. Triệu chứng
+không hề trỏ về nguyên nhân: Turbopack panic với `Failed to write app endpoint /page`,
+kể cả khi trang chỉ có một dòng chữ.
+
+Dùng `npm install --ignore-scripts`. `@google/genai` phát hành kèm `dist/` dựng sẵn nên
+không cần script đó. Nếu về sau thêm gói nào thật sự cần postinstall thì chạy
+`npm rebuild <gói>` riêng cho nó.
+
+**2. Bản standalone không đọc `.env.local`.**
+
+`next dev` và `next start` có đọc, `node .next/standalone/server.js` thì không. Trên
+Cloud Run điều này không thành vấn đề vì khoá đặt ở cấu hình dịch vụ, nhưng chạy thử
+production tại máy mà quên thì `/api/analyze` trả `THIEU_KHOA_API` và rất dễ đi tìm
+nhầm chỗ.
+
+## Triển khai
+
+**Đọc [DEPLOY-AI-STUDIO.md](DEPLOY-AI-STUDIO.md) trước.** Tóm tắt: chỉ cần Publish trên
+Google AI Studio — nó tự dựng Cloud Run, và đó chính là link Cloud Run mà thể lệ yêu cầu.
+Catch chỉ cần một biến `GEMINI_API_KEY`, mà AI Studio tự đặt sẵn.
+
+Phần dưới đây là **đường lui**, dùng khi tự chủ hoàn toàn. Đừng dùng cả hai đường lên
+cùng một dịch vụ.
+
+## Triển khai Cloud Run bằng tay
+
+```bash
+gcloud run deploy catch \
+  --source . \
+  --region asia-southeast1 \
+  --allow-unauthenticated \
+  --set-env-vars GEMINI_API_KEY=xxx \
+  --timeout 180 \
+  --memory 1Gi
+```
+
+`--timeout 180` không phải cho vui: một lượt chấm mất 5–37 giây tuỳ độ dài video, và
+`lib/gemini.server.ts` tự đặt trần chịu đựng 110 giây kèm thử lại. Để timeout mặc định
+60 giây thì video dài sẽ bị cắt giữa chừng.
+
+## Hạn mức Gemini — rủi ro thật cho ngày demo
+
+Đo ngày 26/08: chạy bộ đối chứng bảy video ba lượt mỗi cái là **cạn hạn mức bậc miễn phí**
+giữa chừng, và mọi lượt sau trả `HET_QUOTA`.
+
+Bậc miễn phí giới hạn 8 giờ video YouTube mỗi ngày cộng với trần số yêu cầu. Một buổi
+thử nghiệm dày đặc là đủ để chạm trần — nghĩa là **nếu ngày demo mà sáng hôm đó chạy thử
+nhiều thì tới lúc trình bày có thể hết hạn mức.**
+
+Ba việc phải làm trước ngày demo:
+
+1. **Bật thanh toán cho khoá Gemini**, hoặc chuẩn bị sẵn một khoá thứ hai chưa dùng tới.
+2. Đừng chạy `npm run eval` trong ngày demo. Chạy hôm trước.
+3. Nhớ rằng chấm hai lượt tốn **gấp đôi** token. Nút tắt nằm ngay trong giao diện.
+
+`npm run eval` đã tách `HET_QUOTA` ra khỏi cột "chấm sai" — hết tiền không phải hết đúng,
+gộp hai thứ vào một chỗ là tự lừa mình.
+
+## Bảng xử lý sự cố
+
+| Triệu chứng | Nguyên nhân |
+|---|---|
+| `Failed to write app endpoint /page` dù trang rỗng | node_modules thiếu gói — cài lại với `--ignore-scripts` |
+| `THIEU_KHOA_API` trên bản standalone | chưa truyền `GEMINI_API_KEY` vào tiến trình |
+| `HET_QUOTA` | hết hạn mức Gemini — xem mục ngay trên |
+| `QUA_TAI` | một lượt gọi chạm trần 60 giây và bị cắt. Model đang quá tải; thử lại |
+| `XU_LY_VIDEO_HONG` | Files API không xử lý được tệp — xuất lại sang MP4 |
+| Lỗi trả về nhưng không có mốc thời gian | máy chủ đã bỏ chúng đúng thiết kế; xem `meta.dropped` |
+| Chấm xong mà video còn trên Files API | lệnh xoá bị đặt nhầm vào `try` thay vì `finally` |

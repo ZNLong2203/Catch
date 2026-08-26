@@ -1,0 +1,45 @@
+# ───────────────────────────────────────────────
+#  BÍ MẬT — không bao giờ đẩy lên GitHub
+# ───────────────────────────────────────────────
+*firebase-adminsdk*.json
+*service-account*.json
+service-account*.json
+*-key.json
+gha-creds-*.json
+.env
+.env.*
+!.env.local.example
+*.pem
+*.key
+
+# Tài liệu nội bộ dự thi
+private/
+
+# ───────────────────────────────────────────────
+#  VIDEO TRẺ EM — tuyệt đối không vào lịch sử git
+# ───────────────────────────────────────────────
+# Đây không phải chuyện dung lượng. Video trẻ em mặc đồ bơi mà lỡ commit thì
+# không xoá được khỏi lịch sử git, kể cả khi đã xoá tệp ở commit sau.
+# Xem docs/AN-TOAN.md, mục "Video không bao giờ được nghỉ lại qua đêm".
+tu-lieu/
+user-data/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+!docs/**/*.webm
+
+node_modules/
+.next/
+next-env.d.ts
+out/
+dist/
+.turbo/
+*.tsbuildinfo
+*.log
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.claude/settings.local.json
