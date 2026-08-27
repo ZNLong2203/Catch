@@ -93,7 +93,17 @@ export function useSession() {
     const flush = () => {
       const p = pending.current;
       pending.current = null;
-      if (p) putSession(uid, p, null).catch(() => setCloudError('Chưa đồng bộ được lên Firebase.'));
+      if (!p) return;
+      /* `.catch()` là chưa đủ. setDoc() KIỂM DỮ LIỆU NGAY và ném lỗi đồng bộ khi
+         gặp giá trị lạ — lỗi đó bay thẳng ra ngoài hàm cập nhật state của React
+         và làm sập màn hình, kéo theo mất luôn em vừa chấm. Đã đo: một trường
+         `undefined` sót lại làm "0 em đã chấm" và không quay về được. Một lần
+         ghi hỏng lên đám mây không bao giờ được phép làm mất việc của thầy. */
+      try {
+        putSession(uid, p, null).catch(() => setCloudError('Chưa đồng bộ được lên Firebase.'));
+      } catch {
+        setCloudError('Chưa đồng bộ được lên Firebase.');
+      }
     };
     if (timer.current) clearTimeout(timer.current);
     if (now) flush();

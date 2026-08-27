@@ -39,6 +39,14 @@ function ensure() {
        để thầy mở bảng ưu tiên ở tab khác mà hai tab không giẫm chân nhau. */
     dbInstance = initializeFirestore(app, {
       localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+      /* Bỏ qua trường `undefined` thay vì ném lỗi và từ chối cả tài liệu.
+       *
+       *  `Entry` có hai trường tuỳ chọn (`refused`, `coached`). localStorage nuốt
+       *  `undefined` không kêu ca vì JSON.stringify bỏ chúng đi, nên một trường
+       *  thừa nằm im hàng tuần rồi mới nổ ở Firestore — và nổ theo kiểu làm hỏng
+       *  cả buổi học chứ không riêng trường đó. Đặt ở đây để hai kho lưu hành xử
+       *  giống nhau, và để trường tuỳ chọn thêm sau này không giăng lại cái bẫy đó. */
+      ignoreUndefinedProperties: true,
     });
     /* Chạy thử với emulator: `npm run emu` rồi đặt NEXT_PUBLIC_FIREBASE_EMULATOR=1.
        Thử luật và đường đồng bộ trên dữ liệu thật của thầy là cách hỏng dữ liệu thật. */

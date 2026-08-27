@@ -102,7 +102,10 @@ export function Workspace() {
       skill: analysis.skill,
       faults: analysis.faults,
       dismissed,
-      refused: analysis.refused,
+      /* Chỉ gắn `refused` khi thật sự có. Gán thẳng `analysis.refused` thì mọi em
+         chấm bình thường đều mang theo một trường `undefined` — Firestore từ chối
+         nguyên tài liệu vì nó, và buổi học ngừng đồng bộ. */
+      ...(analysis.refused ? { refused: analysis.refused } : {}),
       createdAt: Date.now(),
     });
     next();

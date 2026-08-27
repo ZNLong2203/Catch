@@ -396,8 +396,8 @@ export function Review({
         )}
 
         {/* ── Lưu vào buổi học ──
-            Tên các em nằm trong localStorage của chính máy giáo viên và không đi
-            đâu cả. Không có cơ sở dữ liệu, không có tài khoản. */}
+            Tên em được lưu ở hai chỗ: localStorage của máy này, và Firestore theo
+            tài khoản. Video thì vẫn không lưu ở đâu cả — xem docs/SAFETY.md. */}
         <form
           className="card mt-6 p-4"
           onSubmit={(e) => { e.preventDefault(); onSave(label.trim() || suggestedLabel, [...dismissed]); }}
