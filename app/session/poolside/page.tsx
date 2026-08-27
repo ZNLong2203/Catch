@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BY_CODE, SEVERITY_META } from '@/lib/faults';
 import { liveFaults, rankEntries, worstSeverity } from '@/lib/session';
 import type { Severity } from '@/lib/types';
-import { useSession } from '@/components/useSession';
+import { useSessionStore } from '@/components/SessionProvider';
 
 /** Chế độ bờ hồ.
  *
@@ -23,7 +23,7 @@ const TONE: Record<Severity, { text: string; ring: string; glow: string }> = {
 };
 
 export default function PoolsidePage() {
-  const { session, ready, patchEntry } = useSession();
+  const { session, ready, patchEntry } = useSessionStore();
   const ranked = rankEntries(session.entries);
   const [i, setI] = useState(0);
   const touchX = useRef<number | null>(null);

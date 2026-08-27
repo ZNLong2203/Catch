@@ -4,8 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { SkillPicker } from './SkillPicker';
 import { SourceInput, type PickedSource } from './SourceInput';
 import { Review } from './Review';
-import { SessionBar } from './SessionBar';
-import { useSession } from './useSession';
+import { useSessionStore } from './SessionProvider';
 import { newId } from '@/lib/session';
 import type { Analysis, Skill } from '@/lib/types';
 
@@ -32,10 +31,7 @@ const LOI_TIENG_VIET: Record<string, string> = {
 type Phase = 'setup' | 'working' | 'done';
 
 export function Workspace() {
-  const {
-    session, ready, storageOk, update, addEntry,
-    syncState, user, cloudError, signIn, signOutTeacher,
-  } = useSession();
+  const { session, ready, storageOk, addEntry, cloudError } = useSessionStore();
   const [skill, setSkill] = useState<Skill | null>(null);
   const [source, setSource] = useState<PickedSource | null>(null);
   const [phase, setPhase] = useState<Phase>('setup');
@@ -136,17 +132,7 @@ export function Workspace() {
         </p>
       )}
 
-      <SessionBar
-        session={session}
-        ready={ready}
-        onChange={(patch) => update((s) => ({ ...s, ...patch }))}
-        syncState={syncState}
-        user={user}
-        onSignIn={signIn}
-        onSignOut={signOutTeacher}
-      />
-
-      <div className="mt-8">
+      <div>
         {reviewing ? (
           <Review
             analysis={analysis}

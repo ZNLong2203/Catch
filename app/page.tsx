@@ -1,18 +1,13 @@
-import { Brand } from '@/components/Brand';
 import { Workspace } from '@/components/Workspace';
 import { hasKey } from '@/lib/gemini.server';
 
 export default function Home() {
   return (
     <div className="mx-auto max-w-6xl px-5 pb-24 pt-8 sm:px-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <Brand tagline />
-        <p className="rounded-full border border-line bg-deep/60 px-3 py-1.5 text-[11px] text-mist">
+      <section className="mx-auto max-w-3xl pb-12 pt-12 text-center sm:pt-20">
+        <p className="mb-8 inline-block rounded-full border border-line bg-deep/60 px-3 py-1.5 text-[11px] text-mist">
           #BuildwithGoogleAI · AI Riser Vietnam 2026
         </p>
-      </header>
-
-      <section className="mx-auto max-w-3xl pb-12 pt-16 text-center sm:pt-24">
         <p className="eyebrow">Mỗi năm gần 2.000 trẻ em Việt Nam chết đuối</p>
         <h1 className="mt-4 text-balance text-3xl font-bold leading-[1.15] tracking-tight sm:text-[2.75rem]">
           Một thầy, ba mươi em, bốn mươi lăm phút.

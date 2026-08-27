@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { BY_CODE, SEVERITY_META, SKILL_META } from '@/lib/faults';
 import { CLASS_WIDE, commonFaults, liveFaults, rankEntries, worstSeverity } from '@/lib/session';
 import { classProgress, compareWithPrevious } from '@/lib/progress';
-import { useSession } from '@/components/useSession';
+import { useSessionStore } from '@/components/SessionProvider';
 import { mmss, formatDate } from '@/lib/time';
 
 /** Giáo án buổi sau — bản in.
@@ -13,7 +13,7 @@ import { mmss, formatDate } from '@/lib/time';
  *  Cố ý là nền trắng chữ đen, không theo bảng màu tối của phần còn lại: thứ này
  *  ra giấy, cầm ra bờ hồ, và không ai in một trang nền đen. */
 export default function PrintPage() {
-  const { session, archive, ready } = useSession();
+  const { session, archive, ready } = useSessionStore();
   const ranked = rankEntries(session.entries);
   const classWide = commonFaults(session.entries).filter((c) => c.share >= CLASS_WIDE && c.students.length >= 2);
   const progress = classProgress(session, archive).filter((c) => c.then !== c.now);

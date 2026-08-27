@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
+import { NavBar } from '@/components/NavBar';
 import { RegisterSW } from '@/components/RegisterSW';
+import { SessionProvider } from '@/components/SessionProvider';
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
@@ -56,7 +58,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi" className={beVietnam.variable}>
       <body className="font-sans antialiased">
         <a href="#lam-viec" className="link-skip">Bỏ qua, tới thẳng chỗ làm việc</a>
-        {children}
+        <SessionProvider>
+          <NavBar />
+          {children}
+        </SessionProvider>
         <RegisterSW />
       </body>
     </html>
