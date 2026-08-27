@@ -1,0 +1,6 @@
+{
+  "name": "Catch",
+  "description": "Trợ giảng cho lớp phổ cập bơi — Chấm kỹ thuật bơi từ video và xếp thứ tự ưu tiên học sinh cần sửa lỗi theo rủi ro đuối nước.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
