@@ -47,6 +47,31 @@ Cloud Run điều này không thành vấn đề vì khoá đặt ở cấu hìn
 production tại máy mà quên thì `/api/analyze` trả `THIEU_KHOA_API` và rất dễ đi tìm
 nhầm chỗ.
 
+## `npm run build` dựng bằng webpack, KHÔNG phải Turbopack
+
+Đây là chỗ dễ bị ai đó "dọn dẹp" nhất, nên ghi rõ lý do.
+
+Turbopack ở chế độ `output: 'standalone'` **cắt mã thành chunk rồi quên xuất một
+mảnh ra đĩa**. Trình duyệt xin một tệp không tồn tại và ăn `ChunkLoadError` ngay
+lần vẽ đầu. Lỗi này bị `catch` nuốt nên trang vẫn hiện — nó chỉ nằm trong console,
+đúng chỗ ban giám khảo mở ra xem.
+
+Tệ nhất là nó phụ thuộc vào **kích thước module**, không phải vào việc mã đúng hay
+sai. Đo được ngày 28/08/2026: cùng một commit dựng sạch hai lần liên tiếp đều
+không lỗi; thêm mười tám dòng chú thích vào `lib/firebase.client.ts` là hỏng ba
+lần liên tiếp. Nghĩa là bất kỳ thay đổi nào sau này cũng có thể làm nó tái phát,
+và `npm run build` vẫn báo thành công.
+
+Bản dựng webpack không có lỗi đó — cùng mã nguồn, cùng phép thử, sạch. Chậm hơn
+khoảng hai giây, đổi lấy một bản dựng nói thật.
+
+`npm run build:turbo` giữ lại đường cũ để thử lại khi Next vá xong.
+
+**Kèm theo:** webpack kiểm kiểu chặt hơn Turbopack, và nó bắt được một lỗi có sẵn
+— hai tệp `app/icon-*/route.tsx` export `contentType`, thứ chỉ hợp lệ cho tệp
+metadata icon chứ không phải Route Handler. Đã bỏ; `ImageResponse` tự đặt
+content-type rồi.
+
 ## Triển khai
 
 **Đọc [DEPLOY-AI-STUDIO.md](DEPLOY-AI-STUDIO.md) trước.** Tóm tắt: chỉ cần Publish trên
@@ -55,6 +80,31 @@ Catch chỉ cần một biến `GEMINI_API_KEY`, mà AI Studio tự đặt sẵn
 
 Phần dưới đây là **đường lui**, dùng khi tự chủ hoàn toàn. Đừng dùng cả hai đường lên
 cùng một dịch vụ.
+
+## `npm run build` dựng bằng webpack, KHÔNG phải Turbopack
+
+Đây là chỗ dễ bị ai đó "dọn dẹp" nhất, nên ghi rõ lý do.
+
+Turbopack ở chế độ `output: 'standalone'` **cắt mã thành chunk rồi quên xuất một
+mảnh ra đĩa**. Trình duyệt xin một tệp không tồn tại và ăn `ChunkLoadError` ngay
+lần vẽ đầu. Lỗi này bị `catch` nuốt nên trang vẫn hiện — nó chỉ nằm trong console,
+đúng chỗ ban giám khảo mở ra xem.
+
+Tệ nhất là nó phụ thuộc vào **kích thước module**, không phải vào việc mã đúng hay
+sai. Đo được ngày 28/08/2026: cùng một commit dựng sạch hai lần liên tiếp đều
+không lỗi; thêm mười tám dòng chú thích vào `lib/firebase.client.ts` là hỏng ba
+lần liên tiếp. Nghĩa là bất kỳ thay đổi nào sau này cũng có thể làm nó tái phát,
+và `npm run build` vẫn báo thành công.
+
+Bản dựng webpack không có lỗi đó — cùng mã nguồn, cùng phép thử, sạch. Chậm hơn
+khoảng hai giây, đổi lấy một bản dựng nói thật.
+
+`npm run build:turbo` giữ lại đường cũ để thử lại khi Next vá xong.
+
+**Kèm theo:** webpack kiểm kiểu chặt hơn Turbopack, và nó bắt được một lỗi có sẵn
+— hai tệp `app/icon-*/route.tsx` export `contentType`, thứ chỉ hợp lệ cho tệp
+metadata icon chứ không phải Route Handler. Đã bỏ; `ImageResponse` tự đặt
+content-type rồi.
 
 ## Triển khai Cloud Run bằng tay
 

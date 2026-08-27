@@ -5,7 +5,7 @@
   "description": "Catch — cham ky thuat boi tu video, tro giang cho lop pho cap boi",
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0",
-    "build": "next build",
+    "build": "next build --webpack",
     "lint": "tsc --noEmit",
     "start": "node .next/standalone/server.js",
     "postbuild": "cp -R .next/static .next/standalone/.next/ && cp -R public .next/standalone/ || true",
@@ -14,7 +14,8 @@
     "test": "node --test --experimental-strip-types --import ./test/register.mjs test/*.test.ts",
     "eval": "node private/probe/eval.mjs",
     "emu": "firebase emulators:start --only auth,firestore --project catch-test",
-    "rules": "firebase deploy --only firestore:rules --project catch-64526"
+    "rules": "firebase deploy --only firestore:rules --project catch-64526",
+    "build:turbo": "next build"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",

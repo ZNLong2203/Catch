@@ -105,16 +105,30 @@ export async function linkGoogle(scopes: string[] = []): Promise<LinkResult> {
         return { ok: true, switched: true, token: GoogleAuthProvider.credentialFromResult(res)?.accessToken };
       } catch { return { ok: false, why: 'Đăng nhập không xong. Thử lại.' }; }
     }
-    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
-      return { ok: false, why: '' };
+    if (code === 'auth/cancelled-popup-request') return { ok: false, why: '' };
+
+    /* KHÔNG im lặng ở đây nữa.
+     *
+     *  Firebase báo `popup-closed-by-user` cả khi thầy đăng nhập xong xuôi:
+     *  Chrome chặn trang đọc `window.closed` của cửa sổ do Google mở — chính là
+     *  mấy dòng Cross-Origin-Opener-Policy trong console — nên Firebase tưởng
+     *  cửa sổ bị đóng giữa chừng. Bản trước nuốt đúng mã lỗi đó, nên thầy bấm
+     *  xong thấy nút quay về như chưa bấm, không một chữ giải thích.
+     *
+     *  Nguyên nhân gốc nằm ngoài tầm sửa của mã nguồn: khung đăng nhập chạy ở
+     *  catch-64526.firebaseapp.com, khác tên miền với trang, nên trình duyệt
+     *  chặn cookie bên thứ ba là chặn luôn đường trả kết quả. Cách dứt điểm là
+     *  cho Firebase Auth chạy trên cùng tên miền với ứng dụng. */
+    if (code === 'auth/popup-closed-by-user') {
+      return { ok: false, why: 'Trình duyệt chặn đường trả kết quả từ cửa sổ Google (thường do chặn cookie bên thứ ba). Thử bật lại cookie bên thứ ba cho trang này, hoặc mở bằng cửa sổ thường thay vì ẩn danh.' };
     }
     if (code === 'auth/popup-blocked') {
-      return { ok: false, why: 'Trình duyệt chặn cửa sổ đăng nhập. Cho phép cửa sổ bật lên rồi thử lại.' };
+      return { ok: false, why: 'Trình duyệt chặn cửa sổ bật lên. Cho phép cửa sổ bật lên cho trang này rồi thử lại.' };
     }
     if (code === 'auth/unauthorized-domain') {
       return { ok: false, why: 'Tên miền này chưa được cho phép trong Firebase Console → Authentication → Settings → Authorized domains.' };
     }
-    return { ok: false, why: 'Đăng nhập không xong. Kiểm tra kết nối rồi thử lại.' };
+    return { ok: false, why: `Đăng nhập không xong (${code || 'không rõ mã lỗi'}). Chụp lại màn hình này nếu cần tìm nguyên nhân.` };
   }
 }
 

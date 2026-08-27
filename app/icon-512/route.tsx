@@ -1,7 +1,10 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'nodejs';
-export const contentType = 'image/png';
+/* KHÔNG export `contentType` ở đây. Đây là Route Handler, không phải tệp
+   metadata icon — `contentType` không nằm trong danh sách export hợp lệ của
+   Route Handler và làm bước kiểm kiểu của bản dựng webpack thất bại. Không cần
+   nó: `ImageResponse` đã tự đặt content-type: image/png. */
 
 /** Biểu tượng cho manifest. Sinh bằng next/og lúc build thay vì kèm sẵn tệp PNG —
  *  một nguồn hình duy nhất, sửa một chỗ là cả hai cỡ đổi theo. */
