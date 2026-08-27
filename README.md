@@ -141,8 +141,19 @@ chủ**, và bị xoá ngay trong cùng một request — lệnh xoá đặt tro
 trong `try`, để hễ Gemini lỗi thì video vẫn được dọn.
 
 Buổi học của thầy — tên các em, kết quả chấm, cả kho buổi cũ để so tiến bộ — nằm trong
-**localStorage của chính trình duyệt trên máy thầy**. Không tài khoản, không cơ sở dữ liệu,
-không có gì rời khỏi máy. Cái giá là đổi máy thì mất; đường thoát là nút *Lưu ra tệp*.
+**localStorage của máy thầy và trên Firestore**. localStorage là bản đọc được ngay cả khi
+mất sóng ở bờ hồ; Firestore là bản theo tài khoản, mở máy khác vẫn còn.
+
+Chưa đăng nhập thì Catch dùng tài khoản ẩn danh — dữ liệu đã lên Firestore nhưng đường về
+nó gắn với trình duyệt này, nên giao diện gọi đúng tên trạng thái đó là *"chỉ máy này"*
+chứ không hứa hẹn gì thêm. Đăng nhập Google thì buổi học mới thật sự theo người.
+
+Ai đọc được gì do [`firestore.rules`](firestore.rules) quyết, và luật đó đã được thử trên
+emulator: **một thầy không đọc và không ghi được vào dữ liệu của thầy khác** (`permission-denied`
+cho cả hai chiều). Kho buổi cũ giữ tối đa 20 buổi rồi tự xoá buổi cũ nhất **khỏi cả Firestore**
+— hạn lưu trữ phải do code giữ, không phải do tài liệu hứa.
+
+**Video thì vẫn không bao giờ được lưu ở đâu cả.** Đó là ranh giới không đổi.
 
 ## Đã đo được gì
 
@@ -214,9 +225,14 @@ Không làm thế thì model mượn mã của kiểu bơi khác để mô tả 
 nội dung cả hai. Một lần Publish thoả cả yêu cầu "dựng bằng AI Studio" lẫn "triển khai lên
 Cloud Run" của thể lệ.
 
-Catch đọc đúng **một** biến môi trường — `GEMINI_API_KEY` — mà AI Studio tự đặt sẵn. Không
-Secrets, không service account, không quyền IAM. Đó là hệ quả trực tiếp của việc không dùng
-cơ sở dữ liệu: không có cơ sở dữ liệu thì không có gì để cấu hình sai.
+Bí mật duy nhất chạy trên máy chủ vẫn là **`GEMINI_API_KEY`**, và AI Studio tự đặt sẵn.
+Sáu biến `NEXT_PUBLIC_FIREBASE_*` không phải bí mật — SDK phía trình duyệt bắt buộc nhìn
+thấy chúng, và thứ chặn người lạ là `firestore.rules`, không phải việc giấu chúng đi. Xem
+`.env.local.example`.
+
+Nhớ hai việc, thiếu là hỏng trong im lặng: **deploy luật** (`firebase deploy --only
+firestore:rules`) và truyền `NEXT_PUBLIC_FIREBASE_*` **lúc build** — Next nướng chúng vào
+gói JavaScript, truyền lúc chạy thì không tới nơi.
 
 Chi tiết và ba cái bẫy ở [docs/DEPLOY-AI-STUDIO.md](docs/DEPLOY-AI-STUDIO.md).
 

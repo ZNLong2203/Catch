@@ -1,0 +1,52 @@
+rules_version = '2';
+
+// ── Luật truy cập Firestore của Catch ────────────────────────────────────
+//
+// Thứ nằm trong đây là hồ sơ đánh giá kỹ thuật bơi của từng đứa trẻ, kèm mô tả
+// cơ thể em dưới nước. Nên luật viết theo hướng đóng: KHÔNG có đường nào đọc
+// được dữ liệu của người khác, kể cả đọc nhầm.
+//
+// Triển khai:
+//     firebase deploy --only firestore:rules
+//
+// Không deploy luật này thì dự án đang chạy ở chế độ mặc định của Firebase —
+// hoặc khoá sạch, hoặc mở toang tuỳ lúc tạo. Cả hai đều sai.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function laChuNha(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // Buổi học đúng hình dạng lib/cloud.ts ghi lên. Kiểm ở đây chứ không chỉ ở
+    // trình duyệt: luật là chỗ duy nhất người dùng không sửa được.
+    function buoiHocHopLe(d) {
+      return d.keys().hasOnly(['id', 'className', 'date', 'entries', 'closedAt', 'updatedAt'])
+        && d.id is string
+        && d.className is string   && d.className.size() <= 60
+        && d.date is string        && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && d.entries is list       && d.entries.size() <= 60
+        && (d.closedAt == null || d.closedAt is number)
+        && d.updatedAt is number;
+    }
+
+    match /users/{uid}/sessions/{sessionId} {
+      allow read: if laChuNha(uid);
+
+      // sessionId phải trùng trường id — nếu không thì một buổi ghi đè lên buổi
+      // khác được, và lịch sử tiến bộ của cả lớp lệch đi mà không ai biết.
+      allow create, update: if laChuNha(uid)
+        && buoiHocHopLe(request.resource.data)
+        && request.resource.data.id == sessionId;
+
+      allow delete: if laChuNha(uid);
+    }
+
+    // Mọi đường khác đóng. Thêm tính năng mới thì mở thêm luật ở đây một cách
+    // có ý thức, đừng nới cái ở trên cho tiện.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

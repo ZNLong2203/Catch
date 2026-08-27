@@ -402,7 +402,7 @@ export function Review({
             </button>
           </div>
           <p className="mt-2.5 text-xs leading-relaxed text-dim">
-            Tên em chỉ nằm trên máy này, không gửi đi đâu. Lỗi thầy đã bỏ cũng được ghi nhớ.
+            Tên em được lưu cùng buổi học — trong máy này và trên Firebase. Lỗi thầy đã bỏ cũng được ghi nhớ.
           </p>
         </form>
 

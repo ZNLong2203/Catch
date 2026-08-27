@@ -34,8 +34,10 @@ export default function SessionPage() {
 
       <footer className="mt-16 border-t border-line pt-6">
         <p className="text-[13px] leading-relaxed text-mist">
-          Buổi học này nằm trong bộ nhớ của chính trình duyệt trên máy thầy. Không có tài khoản,
-          không có cơ sở dữ liệu, không có gì rời khỏi máy — kể cả tên các em.
+          Buổi học được lưu trong trình duyệt máy này và đồng bộ lên Firebase của dự án.
+          Chưa đăng nhập thì dữ liệu gắn với trình duyệt này; đăng nhập Google thì buổi học
+          theo tài khoản, mở máy khác vẫn còn. <strong className="font-semibold text-foam">Video
+          thì không bao giờ được lưu</strong> — nó đi thẳng lên Gemini và bị xoá ngay sau khi chấm.
         </p>
         <p className="mt-3 text-[13px] leading-relaxed text-dim">
           Đây là nhận xét kỹ thuật cho những lần bơi trong hồ có người lớn đứng cạnh.

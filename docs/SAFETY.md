@@ -58,31 +58,42 @@ Quy tắc, không có ngoại lệ:
 
 Nếu buộc phải chọn giữa một tính năng hay và quy tắc này, bỏ tính năng.
 
-## 3b. Buổi học cũng không rời khỏi máy giáo viên
+## 3b. Buổi học nằm trên Firestore — và đây là những gì kèm theo
 
-Tên các em và kết quả chấm nằm trong **localStorage của chính trình duyệt trên máy thầy**
-(`lib/session.ts`). Không tài khoản, không cơ sở dữ liệu, không đồng bộ.
+Tên các em và kết quả chấm nằm ở **hai chỗ**: localStorage của trình duyệt máy thầy, và
+**Firestore** (`lib/cloud.ts`). localStorage là bản đọc được khi mất sóng ở bờ hồ; Firestore
+là bản theo tài khoản, mở máy khác vẫn còn.
 
-Đây là một lựa chọn, không phải một chỗ chưa kịp làm. Một bảng danh sách trẻ em kèm nhận xét
-về khả năng bơi của từng em là hồ sơ về trẻ vị thành niên; đưa nó lên máy chủ thì phải trả lời
-ai được xem, giữ bao lâu, xoá thế nào, ai chịu trách nhiệm khi lộ. Để nguyên trên máy thầy thì
-câu trả lời cho cả bốn câu hỏi đó là *không ai ngoài thầy*.
+Bản trước của tài liệu này lập luận ngược lại — rằng không có cơ sở dữ liệu thì không phải
+trả lời *ai được xem, giữ bao lâu, xoá thế nào, ai chịu trách nhiệm khi lộ*. Quyết định đã
+đổi, nên bốn câu đó bây giờ **phải có câu trả lời thật**, và đây là chúng:
 
-Cái giá phải trả, nói thẳng: đổi máy là mất buổi học, và hai thầy không chia sẻ được cho nhau.
-Nút **In giáo án buổi sau** là đường thoát — thứ cần giữ lại thì in ra giấy.
+**Ai được xem.** Chỉ chủ tài khoản. `firestore.rules` chặn theo `request.auth.uid`, mọi
+đường khác đóng cứng. Đã thử trên emulator: thầy B đọc dữ liệu thầy A → `permission-denied`;
+ghi vào → `permission-denied`. Không deploy luật này thì mọi thứ ở trên vô nghĩa:
+`firebase deploy --only firestore:rules`.
 
-Chọn localStorage thì phải gánh hai chỗ yếu của nó, và cả hai đều phải xử bằng code chứ
-không phải bằng hy vọng:
+**Giữ bao lâu.** Tối đa 20 buổi, đủ một khoá phổ cập bơi. Buổi thứ 21 đẩy buổi cũ nhất
+ra và **xoá thật khỏi Firestore**, không chỉ ẩn khỏi màn hình. Firestore không tự rụng như
+localStorage, nên hạn lưu trữ phải do code giữ — `finishSession` trong `components/useSession.ts`.
 
-- **Trình duyệt được quyền dọn.** localStorage mặc định là loại *được thì giữ*. Safari xoá
-  sạch dữ liệu do script ghi sau bảy ngày không mở trang, mà một khoá phổ cập bơi kéo mười
-  tới mười lăm buổi qua nhiều tuần — nghỉ một tuần rồi quay lại thấy kho buổi cũ trống là
-  mất đúng phần so tiến bộ. `keepStorage()` trong `lib/session.ts` xin trình duyệt giữ lại
-  ngay lúc mở trang.
-- **Ghi hỏng thì phải nói ra.** `saveSession` và `saveArchive` trả về `false` khi trình
-  duyệt chặn lưu trữ, và giao diện báo đỏ ngay đầu chỗ chấm. Nuốt lỗi ở đây nghĩa là thầy
-  chấm ba mươi em suốt bốn mươi lăm phút rồi mở bảng ưu tiên ra thấy trống trơn — kiểu hỏng
-  tệ nhất sản phẩm này có thể mắc.
+**Xoá thế nào.** *Xoá hết* trong bảng ưu tiên xoá luôn trên Firestore. Buổi để ngỏ mồ côi
+— sinh ra khi thầy mở Catch trên hai máy cùng lúc — được dọn tự động: rỗng thì xoá, **có em
+trong đó thì đóng lại cho vào kho chứ không vứt**.
+
+**Ai chịu trách nhiệm khi lộ.** Chủ dự án Firebase. Đây là câu chưa có lời đáp thể chế, và
+nó nằm trong mục *chưa xử lý xong* bên dưới — không phải chỗ để lờ đi.
+
+Hai thứ **không** đổi:
+
+- **Video không bao giờ được lưu ở đâu cả.** Không lên Firestore, không lên Storage, không
+  thumbnail. Nó đi thẳng lên Gemini và bị xoá trong `finally`. Ranh giới này không thương lượng.
+- **Chưa đăng nhập thì không được nói là đã an toàn.** Tài khoản ẩn danh có dữ liệu thật
+  trên Firestore, nhưng đường về nó nằm trong trình duyệt này — xoá dữ liệu duyệt web là mất.
+  Giao diện gọi trạng thái đó là *"chỉ máy này"*, cố ý không dùng chữ "đám mây".
+
+Nút *Lưu ra tệp* vẫn giữ: một tệp cầm tay không phụ thuộc vào tài khoản nào còn sống hay
+dự án Firebase nào còn hạn mức.
 
 ## 4. Thầy quyết định, Catch chỉ xếp thứ tự
 
@@ -102,9 +113,12 @@ Bản in cũng vậy: đó là giáo án, không phải phiếu nhận xét gử
 
 ## Chỗ chưa xử lý xong
 
-- **Chưa có cơ chế xin phép phụ huynh.** Quay video trẻ em cần sự đồng ý, kể cả khi
-  video bị xoá ngay. Bản dự thi nêu rõ đây là việc nhà trường làm trước khi dùng Catch;
-  bản thật cần một bước ghi nhận ngay trong sản phẩm.
+- **Chưa có cơ chế xin phép phụ huynh — và việc chuyển sang Firestore làm chỗ này gấp hơn
+  hẳn.** Khi hồ sơ chỉ nằm trong máy thầy, thiếu bước đồng ý là thiếu sót. Khi nó nằm trên
+  máy chủ của một dự án Firebase có chủ sở hữu, thiếu bước đồng ý là một khoản nợ pháp lý.
+  Đây là việc số một trước khi có người dùng thật.
+- **Chưa có chính sách riêng tư công bố và chưa nêu ai là bên chịu trách nhiệm dữ liệu.**
+  Có cơ sở dữ liệu thì hai thứ này là bắt buộc, không phải tuỳ chọn.
 - **Chưa có huấn luyện viên bơi nào soát lại bảng lỗi** trong `SKILLS-AND-FAULTS.md`.
 - Chưa chặn video có nhiều hơn một trẻ trong khung hình. Nghiêng về chặn — vừa vì quyền
   riêng tư của em không được quay, vừa vì model dễ chấm nhầm người.

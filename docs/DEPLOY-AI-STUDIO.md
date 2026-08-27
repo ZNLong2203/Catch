@@ -33,9 +33,16 @@ cái là hỏng một mảng, và có cái hỏng trong im lặng mà vẫn đ�
 Và AI Studio **tự đặt sẵn biến đó**. Nghĩa là Catch deploy được mà không cần cấu hình gì
 thêm — không Secrets, không service account, không cấp quyền IAM.
 
-Đó không phải may mắn. Đó là hệ quả trực tiếp của việc buổi học nằm trong localStorage của
-máy giáo viên thay vì trong một cơ sở dữ liệu: không có cơ sở dữ liệu thì không có khoá,
-không có quyền, không có thứ để cấu hình sai.
+Phần Firebase thì phải làm tay, và AI Studio không làm hộ được:
+
+1. Tạo dự án Firebase, bật **Authentication** (Anonymous + Google) và **Firestore**.
+2. Chép sáu biến `NEXT_PUBLIC_FIREBASE_*` vào build — xem `.env.local.example`.
+3. `firebase deploy --only firestore:rules`. **Không làm bước này là dữ liệu chạy dưới luật
+   mặc định của Firebase**, hoặc khoá sạch hoặc mở toang tuỳ lúc tạo dự án. Cả hai đều sai.
+4. Thêm tên miền đang chạy vào *Authentication → Settings → Authorized domains*, nếu không
+   thì nút đăng nhập Google mở ra rồi báo `auth/unauthorized-domain`.
+
+Bỏ trống cụm biến Firebase thì Catch vẫn dựng và chạy được, chỉ là không đồng bộ.
 
 ## Ba bước
 

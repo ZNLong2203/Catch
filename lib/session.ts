@@ -3,8 +3,11 @@ import type { Fault, FaultCode, Severity, Skill } from './types';
 
 /** Một buổi học: giáo viên chấm lần lượt từng em, Catch gom lại thành thứ tự ưu tiên.
  *
- *  Toàn bộ buổi học nằm trong localStorage của chính máy giáo viên. Không có cơ sở
- *  dữ liệu, không có tài khoản, không có gì rời khỏi máy — kể cả tên các em.
+ *  Buổi học nằm trong localStorage của máy giáo viên VÀ trên Firestore (xem
+ *  lib/cloud.ts). localStorage là bản đọc được ngay cả khi chưa có mạng; Firestore
+ *  là bản theo tài khoản, sang máy khác vẫn còn.
+ *
+ *  Video thì vẫn không bao giờ được lưu ở đâu cả — đó là ranh giới không đổi.
  *  Xem docs/SAFETY.md. */
 export type Entry = {
   id: string;

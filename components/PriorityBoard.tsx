@@ -252,7 +252,7 @@ export function PriorityBoard({
         {note && <p role="status" className="text-[13px] text-aqua">{note}</p>}
 
         <p className="pt-1 text-xs leading-relaxed text-dim">
-          Đã lưu {archive.length} buổi trước. Buổi học nằm trong bộ nhớ trình duyệt trên máy này —
+          Đã lưu {archive.length} buổi trước. Buổi học nằm trong trình duyệt máy này và trên Firebase —
           đổi máy thì dùng <em>Lưu ra tệp</em> rồi <em>Nạp từ tệp</em>.
         </p>
       </div>

@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { ArrowRightIcon } from 'lucide-react';
+import type { User } from 'firebase/auth';
 import type { Session } from '@/lib/session';
 import { DatePicker } from './DatePicker';
+import { SyncBadge } from './SyncBadge';
+import type { SyncState } from './useSession';
 
 /** Thanh nhận diện buổi học: lớp nào, ngày nào, đã chấm mấy em.
  *
@@ -11,9 +14,11 @@ import { DatePicker } from './DatePicker';
  *  thành một cụm và nhường hẳn bên phải cho con số em đã chấm — thứ duy nhất
  *  ở đây thay đổi trong lúc làm việc, và là thứ thầy liếc lên nhìn. */
 export function SessionBar({
-  session, ready, onChange,
+  session, ready, onChange, syncState, user, onSignIn, onSignOut,
 }: {
   session: Session; ready: boolean; onChange: (patch: Partial<Session>) => void;
+  syncState: SyncState; user: User | null;
+  onSignIn: () => Promise<unknown>; onSignOut: () => Promise<unknown>;
 }) {
   const n = session.entries.length;
 
@@ -40,6 +45,7 @@ export function SessionBar({
       </div>
 
       <div className="ml-auto flex flex-wrap items-center justify-end gap-x-3 gap-y-2 whitespace-nowrap">
+        {ready && <SyncBadge state={syncState} user={user} onSignIn={onSignIn} onSignOut={onSignOut} />}
         <span className="text-sm text-mist" aria-live="polite">
           {ready ? (n === 0 ? 'chưa chấm em nào' : `${n} em đã chấm`) : ' '}
         </span>

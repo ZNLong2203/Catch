@@ -32,7 +32,10 @@ const LOI_TIENG_VIET: Record<string, string> = {
 type Phase = 'setup' | 'working' | 'done';
 
 export function Workspace() {
-  const { session, ready, storageOk, update, addEntry } = useSession();
+  const {
+    session, ready, storageOk, update, addEntry,
+    syncState, user, cloudError, signIn, signOutTeacher,
+  } = useSession();
   const [skill, setSkill] = useState<Skill | null>(null);
   const [source, setSource] = useState<PickedSource | null>(null);
   const [phase, setPhase] = useState<Phase>('setup');
@@ -122,7 +125,23 @@ export function Workspace() {
         </p>
       )}
 
-      <SessionBar session={session} ready={ready} onChange={(patch) => update((s) => ({ ...s, ...patch }))} />
+      {/* Firestore nhận ghi khi ngoại tuyến rồi đẩy lên sau, nên đây KHÔNG phải
+          báo mất dữ liệu — chỉ là chưa lên tới nơi. Nói đúng mức độ. */}
+      {cloudError && (
+        <p role="status" className="mb-4 rounded-2xl border border-warn/30 bg-warn/[0.07] px-4 py-3 text-sm leading-relaxed text-warn">
+          {cloudError} Buổi học vẫn nằm trong máy này và sẽ tự đẩy lên khi có mạng lại.
+        </p>
+      )}
+
+      <SessionBar
+        session={session}
+        ready={ready}
+        onChange={(patch) => update((s) => ({ ...s, ...patch }))}
+        syncState={syncState}
+        user={user}
+        onSignIn={signIn}
+        onSignOut={signOutTeacher}
+      />
 
       <div className="mt-8">
         {reviewing ? (
