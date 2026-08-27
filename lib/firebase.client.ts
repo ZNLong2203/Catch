@@ -10,18 +10,11 @@ import {
   connectFirestoreEmulator, initializeFirestore, persistentLocalCache,
   persistentMultipleTabManager, type Firestore,
 } from 'firebase/firestore';
+import { resolveConfig } from './firebase.config';
 
-/** Cấu hình đọc lúc build. Khoá `apiKey` của Firebase không phải bí mật — nó chỉ
- *  định danh dự án, còn ai đọc được cái gì do `firestore.rules` quyết. Bí mật
- *  thật của Catch vẫn là `GEMINI_API_KEY`, và cái đó nằm ở máy chủ. */
-const config = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+/* Cấu hình và lý do ghi cứng nằm ở lib/firebase.config.ts — tách ra để thử được
+   mà không phải nạp cả SDK Firebase vào bộ thử. */
+const config = resolveConfig(process.env as Record<string, string | undefined>);
 
 /** Chưa cấu hình Firebase thì Catch vẫn phải chạy.
  *
@@ -38,7 +31,7 @@ let dbInstance: Firestore | null = null;
 function ensure() {
   if (!firebaseReady) return null;
   if (!app) {
-    app = getApps()[0] ?? initializeApp(config as Required<typeof config>);
+    app = getApps()[0] ?? initializeApp(config);
     authInstance = getAuth(app);
     /* Bộ đệm ngoại tuyến KHÔNG phải tuỳ chọn cho Catch. Chế độ bờ hồ phải mở
        được khi thầy đứng ở hồ trường huyện sóng chập chờn, và Firestore đọc
@@ -113,4 +106,25 @@ export async function linkGoogle(): Promise<LinkResult> {
 export async function leaveAccount(): Promise<void> {
   const a = getAuthClient();
   if (a) await signOut(a);
+}
+
+/** Google Analytics — đếm lượt dùng, KHÔNG đếm các em.
+ *
+ *  Ranh giới ở đây hẹp và phải giữ cho hẹp: chỉ lượt xem trang và vài sự kiện
+ *  sản phẩm không mang dữ liệu cá nhân. Không tên em, không nhãn lỗi của một em
+ *  cụ thể, không nội dung buổi học, không bao giờ có video. Cần biết "hôm nay
+ *  có bao nhiêu lượt chấm" thì đếm số lượt; muốn biết chấm cho em nào thì mở
+ *  máy thầy ra mà xem, và Catch không làm chuyện đó.
+ *
+ *  Nạp muộn và chỉ khi trình duyệt đỡ được — `firebase/analytics` kéo theo một
+ *  cục JavaScript không nhỏ, mà thứ Catch cần chạy trước là màn hình chấm. */
+export async function startAnalytics(): Promise<void> {
+  if (!firebaseReady || typeof window === 'undefined') return;
+  if (!config.measurementId) return;
+  try {
+    const { getAnalytics, isSupported } = await import('firebase/analytics');
+    if (!(await isSupported())) return;
+    const ctx = ensure();
+    if (ctx) getAnalytics(app!);
+  } catch { /* chặn quảng cáo hoặc trình duyệt không đỡ — không phải lỗi */ }
 }

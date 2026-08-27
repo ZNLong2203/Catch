@@ -6,7 +6,7 @@ import {
   emptySession, keepStorage, loadArchive, loadSession, saveArchive, saveSession,
   type Entry, type Session,
 } from '@/lib/session';
-import { firebaseReady, leaveAccount, linkGoogle, watchUser } from '@/lib/firebase.client';
+import { firebaseReady, leaveAccount, linkGoogle, startAnalytics, watchUser } from '@/lib/firebase.client';
 import { dropSession, putSession, watchSessions } from '@/lib/cloud';
 
 const KEYS = ['catch:session:v1', 'catch:archive:v1'];
@@ -77,6 +77,7 @@ export function useSession() {
   /* ── Danh tính ──────────────────────────────────────────────────────── */
   useEffect(() => {
     if (!firebaseReady) return;
+    void startAnalytics();
     return watchUser((u) => {
       uidRef.current = u?.uid ?? null;
       hydrated.current = false;
