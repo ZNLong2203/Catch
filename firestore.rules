@@ -21,13 +21,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function laChuNha(uid) {
+    function isOwner(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
 
     // Buổi học đúng hình dạng lib/cloud.ts ghi lên. Kiểm ở đây chứ không chỉ ở
     // trình duyệt: luật là chỗ duy nhất người dùng không sửa được.
-    function buoiHocHopLe(d) {
+    function isValidSession(d) {
       return d.keys().hasOnly(['id', 'className', 'date', 'entries', 'closedAt', 'updatedAt'])
         && d.id is string
         && d.className is string   && d.className.size() <= 60
@@ -38,15 +38,15 @@ service cloud.firestore {
     }
 
     match /users/{uid}/sessions/{sessionId} {
-      allow read: if laChuNha(uid);
+      allow read: if isOwner(uid);
 
       // sessionId phải trùng trường id — nếu không thì một buổi ghi đè lên buổi
       // khác được, và lịch sử tiến bộ của cả lớp lệch đi mà không ai biết.
-      allow create, update: if laChuNha(uid)
-        && buoiHocHopLe(request.resource.data)
+      allow create, update: if isOwner(uid)
+        && isValidSession(request.resource.data)
         && request.resource.data.id == sessionId;
 
-      allow delete: if laChuNha(uid);
+      allow delete: if isOwner(uid);
     }
 
     // Mọi đường khác đóng. Thêm tính năng mới thì mở thêm luật ở đây một cách

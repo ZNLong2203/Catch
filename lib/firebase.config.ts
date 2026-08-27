@@ -19,7 +19,7 @@
  *  Việc nên làm trong Google Cloud Console: khoá `apiKey` này theo HTTP referrer,
  *  chỉ cho tên miền của Catch. Không phải để giữ bí mật — mà để người khác không
  *  mượn hạn mức Firebase của dự án này. */
-export const MAC_DINH = {
+export const DEFAULTS = {
   apiKey: 'AIzaSyC6WilJSncRV1Je7Y_hULr0tjCIASYCUC4',
   authDomain: 'catch-64526.firebaseapp.com',
   projectId: 'catch-64526',
@@ -29,23 +29,23 @@ export const MAC_DINH = {
   measurementId: 'G-7M943PSER2',
 } as const;
 
-export type FirebaseConfig = { -readonly [K in keyof typeof MAC_DINH]: string };
+export type FirebaseConfig = { -readonly [K in keyof typeof DEFAULTS]: string };
 
 /** Biến môi trường đè lên cấu hình mặc định — nhưng chuỗi rỗng thì không tính là
  *  đè. Một biến khai báo mà bỏ trống trong lần deploy vội là chuyện thường, và
  *  nó phải cho ra bản chạy được chứ không phải một `apiKey` rỗng. */
 export function resolveConfig(env: Record<string, string | undefined>): FirebaseConfig {
-  const lay = (ten: string, macDinh: string) => {
-    const v = env[ten];
-    return v && v.trim() !== '' ? v.trim() : macDinh;
+  const pick = (key: string, fallback: string) => {
+    const v = env[key];
+    return v && v.trim() !== '' ? v.trim() : fallback;
   };
   return {
-    apiKey: lay('NEXT_PUBLIC_FIREBASE_API_KEY', MAC_DINH.apiKey),
-    authDomain: lay('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', MAC_DINH.authDomain),
-    projectId: lay('NEXT_PUBLIC_FIREBASE_PROJECT_ID', MAC_DINH.projectId),
-    storageBucket: lay('NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET', MAC_DINH.storageBucket),
-    messagingSenderId: lay('NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID', MAC_DINH.messagingSenderId),
-    appId: lay('NEXT_PUBLIC_FIREBASE_APP_ID', MAC_DINH.appId),
-    measurementId: lay('NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID', MAC_DINH.measurementId),
+    apiKey: pick('NEXT_PUBLIC_FIREBASE_API_KEY', DEFAULTS.apiKey),
+    authDomain: pick('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', DEFAULTS.authDomain),
+    projectId: pick('NEXT_PUBLIC_FIREBASE_PROJECT_ID', DEFAULTS.projectId),
+    storageBucket: pick('NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET', DEFAULTS.storageBucket),
+    messagingSenderId: pick('NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID', DEFAULTS.messagingSenderId),
+    appId: pick('NEXT_PUBLIC_FIREBASE_APP_ID', DEFAULTS.appId),
+    measurementId: pick('NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID', DEFAULTS.measurementId),
   };
 }

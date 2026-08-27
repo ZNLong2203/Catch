@@ -18,10 +18,10 @@ export function fromISO(iso: string): Date | undefined {
 export const toISO = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-const THU = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+const WEEKDAY_NAMES = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
 /** '2026-08-27' → '27/08/2026'. Thầy đọc ngày kiểu Việt, không đọc ISO. */
-export function ngayVN(iso: string): string {
+export function formatDate(iso: string): string {
   const d = fromISO(iso);
   if (!d) return iso;
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
@@ -32,12 +32,12 @@ export function ngayVN(iso: string): string {
  *  Hai chữ đầu thầy liếc là biết, còn con số thì phải đọc. Năm chỉ hiện khi
  *  buổi không thuộc năm nay — bày thêm bốn chữ số cho một buổi hôm qua chỉ
  *  làm thanh này dài ra và đẩy nút "Thứ tự ưu tiên" xuống dòng. */
-export function ngayVNNgan(iso: string, now = new Date()): string {
+export function formatDateRelative(iso: string, now = new Date()): string {
   const d = fromISO(iso);
   if (!d) return iso;
-  const homNay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const days = Math.round((d.getTime() - homNay.getTime()) / 86_400_000);
-  const dau = days === 0 ? 'Hôm nay' : days === -1 ? 'Hôm qua' : days === 1 ? 'Ngày mai' : THU[d.getDay()];
-  const ngay = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-  return `${dau} · ${ngay}${d.getFullYear() === now.getFullYear() ? '' : `/${d.getFullYear()}`}`;
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.round((d.getTime() - today.getTime()) / 86_400_000);
+  const prefix = days === 0 ? 'Hôm nay' : days === -1 ? 'Hôm qua' : days === 1 ? 'Ngày mai' : WEEKDAY_NAMES[d.getDay()];
+  const dayMonth = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+  return `${prefix} · ${dayMonth}${d.getFullYear() === now.getFullYear() ? '' : `/${d.getFullYear()}`}`;
 }

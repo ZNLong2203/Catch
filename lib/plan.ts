@@ -1,7 +1,7 @@
 import { BY_CODE } from './faults';
 import { classProgress } from './progress';
 import { CLASS_WIDE, commonFaults, worstSeverity, type Session } from './session';
-import { ngayVN } from './time';
+import { formatDate } from './time';
 
 /** Nội dung nhắc cho buổi sau, dạng chữ trơn để nhét vào một sự kiện lịch.
  *
@@ -22,56 +22,56 @@ export type Plan = { title: string; description: string };
 
 /** Bao nhiêu lỗi dạy chung đưa vào nhắc. Ba là hết chỗ đọc trên màn hình khoá
  *  điện thoại — thầy liếc lịch trước giờ dạy chứ không ngồi đọc. */
-const SO_LOI_DAY_CHUNG = 3;
+const MAX_CLASS_WIDE_FAULTS = 3;
 
 export function nextSessionPlan(
   session: Session,
   archive: Session[],
-  linkCatch: string,
+  appUrl: string,
 ): Plan {
-  const lop = session.className.trim();
-  const title = lop ? `Bơi — Lớp ${lop}` : 'Bơi — buổi sau';
+  const className = session.className.trim();
+  const title = className ? `Bơi — Lớp ${className}` : 'Bơi — buổi sau';
 
-  const soEm = session.entries.length;
-  const soEmDo = session.entries.filter((e) => worstSeverity(e) === 'red').length;
+  const total = session.entries.length;
+  const atRisk = session.entries.filter((e) => worstSeverity(e) === 'red').length;
 
-  const dayChung = commonFaults(session.entries)
+  const classWide = commonFaults(session.entries)
     .filter((c) => c.share >= CLASS_WIDE && c.students.length >= 2)
-    .slice(0, SO_LOI_DAY_CHUNG);
+    .slice(0, MAX_CLASS_WIDE_FAULTS);
 
-  const tienBo = classProgress(session, archive)
+  const progress = classProgress(session, archive)
     .filter((c) => c.then !== c.now)
-    .slice(0, SO_LOI_DAY_CHUNG);
+    .slice(0, MAX_CLASS_WIDE_FAULTS);
 
-  const dong: string[] = [];
+  const lines: string[] = [];
 
-  dong.push(
-    soEm === 0
+  lines.push(
+    total === 0
       ? 'Buổi trước chưa chấm em nào.'
-      : soEmDo > 0
-        ? `${soEmDo} trên ${soEm} em có lỗi nhóm nguy hiểm ở chỗ sâu — sửa trước tiên.`
-        : `Đã chấm ${soEm} em, không em nào rơi vào nhóm nguy hiểm ở chỗ sâu.`,
+      : atRisk > 0
+        ? `${atRisk} trên ${total} em có lỗi nhóm nguy hiểm ở chỗ sâu — sửa trước tiên.`
+        : `Đã chấm ${total} em, không em nào rơi vào nhóm nguy hiểm ở chỗ sâu.`,
   );
 
-  if (dayChung.length > 0) {
-    dong.push('', 'DẠY CHUNG CẢ LỚP');
-    for (const c of dayChung) {
+  if (classWide.length > 0) {
+    lines.push('', 'DẠY CHUNG CẢ LỚP');
+    for (const c of classWide) {
       // students.length — KHÔNG phải students
-      dong.push(`• ${c.spec.label} — ${c.students.length}/${soEm} em`);
-      dong.push(`  ${c.spec.drill}`);
+      lines.push(`• ${c.spec.label} — ${c.students.length}/${total} em`);
+      lines.push(`  ${c.spec.drill}`);
     }
   }
 
-  if (tienBo.length > 0) {
-    dong.push('', `SO VỚI BUỔI ${ngayVN(tienBo[0].previousDate)}`);
-    for (const c of tienBo) {
-      const dau = c.now < c.then ? '↓' : '↑';
-      dong.push(`• ${BY_CODE.get(c.code)!.label}: ${c.then} → ${c.now} em ${dau}`);
+  if (progress.length > 0) {
+    lines.push('', `SO VỚI BUỔI ${formatDate(progress[0].previousDate)}`);
+    for (const c of progress) {
+      const arrow = c.now < c.then ? '↓' : '↑';
+      lines.push(`• ${BY_CODE.get(c.code)!.label}: ${c.then} → ${c.now} em ${arrow}`);
     }
   }
 
-  dong.push('', `Xem từng em: ${linkCatch.replace(/\/+$/, '')}/session`);
-  dong.push('', 'Nhắc này cố ý không ghi tên em nào — lịch hay được chia sẻ trong trường.');
+  lines.push('', `Xem từng em: ${appUrl.replace(/\/+$/, '')}/session`);
+  lines.push('', 'Nhắc này cố ý không ghi tên em nào — lịch hay được chia sẻ trong trường.');
 
-  return { title, description: dong.join('\n') };
+  return { title, description: lines.join('\n') };
 }

@@ -68,7 +68,7 @@ export function watchUser(cb: (u: User | null) => void): () => void {
   });
 }
 
-export const SCOPE_LICH = 'https://www.googleapis.com/auth/calendar.events';
+export const CALENDAR_SCOPE = 'https://www.googleapis.com/auth/calendar.events';
 
 export type LinkResult =
   | { ok: true; switched: boolean; token?: string }

@@ -93,9 +93,9 @@ test('lớp rỗng không làm sập bảng ưu tiên', () => {
 
 const withStorage = (setItem: () => void, run: () => void) => {
   const g = globalThis as { window?: unknown };
-  const truoc = g.window;
+  const prev = g.window;
   g.window = { localStorage: { setItem, getItem: () => null } };
-  try { run(); } finally { if (truoc === undefined) delete g.window; else g.window = truoc; }
+  try { run(); } finally { if (prev === undefined) delete g.window; else g.window = prev; }
 };
 
 test('saveSession: báo false khi trình duyệt chặn lưu trữ', () => {

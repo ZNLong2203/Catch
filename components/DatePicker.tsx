@@ -6,7 +6,7 @@ import { CalendarIcon, ChevronDownIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { fromISO, ngayVN, ngayVNNgan, toISO } from '@/lib/time';
+import { fromISO, formatDate, formatDateRelative, toISO } from '@/lib/time';
 
 /** Chọn ngày buổi học.
  *
@@ -18,14 +18,14 @@ import { fromISO, ngayVN, ngayVNNgan, toISO } from '@/lib/time';
  *  và cái duy nhất một ngày tương lai làm được là làm hỏng thứ tự khi so tiến
  *  bộ giữa các buổi. */
 export function DatePicker({
-  value, onChange, className, huong = 'da-qua',
+  value, onChange, className, direction = 'past',
 }: {
   value: string;
   onChange: (iso: string) => void;
   className?: string;
-  /** `da-qua` — chỉ cho chọn hôm nay trở về trước (chấm buổi đã xảy ra).
-   *  `sap-toi` — chỉ cho chọn hôm nay trở đi (hẹn buổi sau). */
-  huong?: 'da-qua' | 'sap-toi';
+  /** `past` — chỉ cho chọn hôm nay trở về trước (chấm buổi đã xảy ra).
+   *  `future` — chỉ cho chọn hôm nay trở đi (hẹn buổi sau). */
+  direction?: 'past' | 'future';
 }) {
   const [open, setOpen] = useState(false);
   const selected = fromISO(value);
@@ -35,7 +35,7 @@ export function DatePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        aria-label={`Ngày học: ${ngayVN(value)}`}
+        aria-label={`Ngày học: ${formatDate(value)}`}
         className={cn(
           'flex items-center gap-2 whitespace-nowrap rounded-lg border border-line bg-deep px-2.5 py-1.5 text-sm',
           'transition-colors hover:border-aqua/40 data-[state=open]:border-aqua/50',
@@ -43,7 +43,7 @@ export function DatePicker({
         )}
       >
         <CalendarIcon aria-hidden className="size-4 shrink-0 text-dim" />
-        <span suppressHydrationWarning className="tabular-nums">{ngayVNNgan(value, now)}</span>
+        <span suppressHydrationWarning className="tabular-nums">{formatDateRelative(value, now)}</span>
         <ChevronDownIcon aria-hidden className="size-3.5 shrink-0 text-dim" />
       </PopoverTrigger>
 
@@ -54,7 +54,7 @@ export function DatePicker({
           selected={selected}
           defaultMonth={selected ?? today}
           onSelect={(d) => { if (d) { onChange(toISO(d)); setOpen(false); } }}
-          disabled={huong === 'da-qua' ? { after: today } : { before: today }}
+          disabled={direction === 'past' ? { after: today } : { before: today }}
           autoFocus
         />
         <div className="flex items-center justify-between gap-2 border-t border-line px-3 py-2">
@@ -69,13 +69,13 @@ export function DatePicker({
             type="button"
             onClick={() => {
               const d = new Date(today);
-              d.setDate(d.getDate() + (huong === 'da-qua' ? -1 : 7));
+              d.setDate(d.getDate() + (direction === 'past' ? -1 : 7));
               onChange(toISO(d));
               setOpen(false);
             }}
             className="rounded-md px-2 py-1 text-xs font-medium text-mist transition-colors hover:bg-raised"
           >
-            {huong === 'da-qua' ? 'Hôm qua' : 'Tuần sau'}
+            {direction === 'past' ? 'Hôm qua' : 'Tuần sau'}
           </button>
         </div>
       </PopoverContent>

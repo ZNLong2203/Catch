@@ -13,8 +13,8 @@
     "probe": "node private/probe/probe.mjs",
     "test": "node --test --experimental-strip-types --import ./test/register.mjs test/*.test.ts",
     "eval": "node private/probe/eval.mjs",
-    "emu": "firebase-tools emulators:start --only auth,firestore --project catch-test",
-    "rules": "firebase-tools deploy --only firestore:rules --project catch-64526"
+    "emu": "firebase emulators:start --only auth,firestore --project catch-test",
+    "rules": "firebase deploy --only firestore:rules --project catch-64526"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",

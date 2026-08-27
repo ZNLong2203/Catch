@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { User } from 'firebase/auth';
 import {
-  emptySession, keepStorage, loadArchive, loadSession, saveArchive, saveSession,
+  emptySession, requestPersistentStorage, loadArchive, loadSession, saveArchive, saveSession,
   type Entry, type Session,
 } from '@/lib/session';
 import { firebaseReady, leaveAccount, linkGoogle, startAnalytics, watchUser } from '@/lib/firebase.client';
@@ -30,7 +30,7 @@ export type SyncState = 'off' | 'device' | 'account';
  *  Thầy gõ tên lớp "4A" là ba lần đổi state. Ghi thẳng lên Firestore từng lần là
  *  ba lượt ghi tính tiền, trên đường truyền 3G ở bờ hồ. Chỉ hoãn phần siêu dữ
  *  liệu — thêm hay xoá một em là hành động dứt khoát, ghi ngay. */
-const HOAN_MS = 600;
+const DEBOUNCE_MS = 600;
 
 /** Số buổi cũ giữ lại — khớp với KEEP trong lib/session.ts. Đủ cho một khoá phổ
  *  cập bơi, và là hạn lưu trữ mà docs/SAFETY.md hứa với phụ huynh. */
@@ -63,7 +63,7 @@ export function useSession() {
     setSession(loadSession());
     setArchive(loadArchive());
     setReady(true);
-    void keepStorage();
+    void requestPersistentStorage();
 
     const onStorage = (e: StorageEvent) => {
       if (!e.key || !KEYS.includes(e.key)) return;
@@ -97,7 +97,7 @@ export function useSession() {
     };
     if (timer.current) clearTimeout(timer.current);
     if (now) flush();
-    else timer.current = setTimeout(flush, HOAN_MS);
+    else timer.current = setTimeout(flush, DEBOUNCE_MS);
   }, []);
 
   /* ── Firestore ──────────────────────────────────────────────────────────

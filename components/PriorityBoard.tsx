@@ -6,7 +6,7 @@ import { BY_CODE, SEVERITY_META } from '@/lib/faults';
 import { classProgress, compareWithPrevious } from '@/lib/progress';
 import { CLASS_WIDE, commonFaults, liveFaults, rankEntries, worstSeverity, type Entry, type Session } from '@/lib/session';
 import type { Severity } from '@/lib/types';
-import { mmss, ngayVN } from '@/lib/time';
+import { mmss, formatDate } from '@/lib/time';
 import { CalendarReminder } from './CalendarReminder';
 import type { Backup } from './useSession';
 
@@ -70,7 +70,7 @@ function EntryRow({
           {/* So với chính em này ở buổi trước */}
           {progress && (progress.fixed.length > 0 || progress.appeared.length > 0) && (
             <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-t border-line/60 pt-2.5 text-xs">
-              <span className="text-dim">so với buổi {ngayVN(progress.previousDate)}:</span>
+              <span className="text-dim">so với buổi {formatDate(progress.previousDate)}:</span>
               {progress.fixed.map((c) => (
                 <span key={c} className="rounded-md bg-calm/10 px-1.5 py-0.5 text-calm">
                   hết · {BY_CODE.get(c)!.label}
@@ -152,7 +152,7 @@ export function PriorityBoard({
       {/* ── Việc dạy hôm trước có ăn thua không ── */}
       {progress.length > 0 && (
         <section className="card border-calm/25 bg-calm/[0.04] p-5">
-          <h2 className="text-base font-semibold tracking-tight text-calm">So với buổi {ngayVN(progress[0].previousDate)}</h2>
+          <h2 className="text-base font-semibold tracking-tight text-calm">So với buổi {formatDate(progress[0].previousDate)}</h2>
           <p className="mt-1.5 text-[13px] leading-relaxed text-mist">
             Đây là câu mà chấm từng buổi rời rạc không nói được: thứ thầy dạy buổi trước có ăn thua gì không.
           </p>
@@ -232,7 +232,7 @@ export function PriorityBoard({
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 text-[13px]">
           <button
-            onClick={() => { if (confirm(`Đóng buổi ${ngayVN(session.date)} và mở buổi mới? Buổi này được giữ lại để so tiến bộ.`)) onFinish(); }}
+            onClick={() => { if (confirm(`Đóng buổi ${formatDate(session.date)} và mở buổi mới? Buổi này được giữ lại để so tiến bộ.`)) onFinish(); }}
             className="text-aqua/90 underline decoration-dotted underline-offset-4 transition hover:text-aqua"
           >
             Kết thúc buổi học

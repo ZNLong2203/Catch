@@ -12,15 +12,15 @@ const entry = (label: string, faults: Fault[]): Entry =>
   ({ id: `e${++seq}`, label, skill: 'breaststroke', faults, dismissed: [], createdAt: ++seq });
 
 /* Tên các em phải hiếm và dễ nhận, để phép thử bắt được nếu chúng lọt ra */
-const TEN_EM = ['Nguyễn Quốc Bảo', 'Trần Khánh Vy', 'Lê Hoàng Phúc', 'Phạm Bảo Trân'];
+const STUDENT_NAMES = ['Nguyễn Quốc Bảo', 'Trần Khánh Vy', 'Lê Hoàng Phúc', 'Phạm Bảo Trân'];
 
-const buoi = (): Session => ({
+const makeSession = (): Session => ({
   id: 's1', className: '4A', date: '2026-08-27',
   entries: [
-    entry(TEN_EM[0], [fault('BR_NO_GLIDE'), fault('BR_HEAD_HIGH')]),
-    entry(TEN_EM[1], [fault('BR_NO_GLIDE')]),
-    entry(TEN_EM[2], [fault('BR_HEAD_HIGH')]),
-    entry(TEN_EM[3], [fault('BR_WIDE_PULL')]),
+    entry(STUDENT_NAMES[0], [fault('BR_NO_GLIDE'), fault('BR_HEAD_HIGH')]),
+    entry(STUDENT_NAMES[1], [fault('BR_NO_GLIDE')]),
+    entry(STUDENT_NAMES[2], [fault('BR_HEAD_HIGH')]),
+    entry(STUDENT_NAMES[3], [fault('BR_WIDE_PULL')]),
   ],
 });
 
@@ -29,15 +29,15 @@ const buoi = (): Session => ({
    hiện cho người được uỷ quyền. Một lần lọt là không rút lại được. */
 
 test('nhắc lịch KHÔNG chứa tên em nào', () => {
-  const p = nextSessionPlan(buoi(), [], 'https://catch-zkare.ai.studio');
+  const p = nextSessionPlan(makeSession(), [], 'https://catch-zkare.ai.studio');
   const text = p.title + '\n' + p.description;
-  for (const ten of TEN_EM) {
-    assert.ok(!text.includes(ten), `tên "${ten}" đã lọt vào nhắc lịch:\n${text}`);
+  for (const name of STUDENT_NAMES) {
+    assert.ok(!text.includes(name), `tên "${name}" đã lọt vào nhắc lịch:\n${text}`);
   }
 });
 
 test('nhắc lịch vẫn nói đúng con số mức lớp', () => {
-  const p = nextSessionPlan(buoi(), [], 'https://catch-zkare.ai.studio');
+  const p = nextSessionPlan(makeSession(), [], 'https://catch-zkare.ai.studio');
   assert.equal(p.title, 'Bơi — Lớp 4A');
   // BR_NO_GLIDE là lỗi đỏ, hai em mắc -> hai em thuộc nhóm nguy hiểm
   assert.match(p.description, /2 trên 4 em/);
@@ -47,7 +47,7 @@ test('nhắc lịch vẫn nói đúng con số mức lớp', () => {
 });
 
 test('có buổi cũ thì nói được tiến bộ, vẫn không có tên em', () => {
-  const cu: Session = {
+  const previous: Session = {
     id: 's0', className: '4A', date: '2026-08-20',
     entries: [
       entry('Đặng Thuỳ Linh', [fault('BR_HEAD_HIGH')]),
@@ -55,11 +55,11 @@ test('có buổi cũ thì nói được tiến bộ, vẫn không có tên em', 
       entry('Bùi Gia Hân', [fault('BR_HEAD_HIGH')]),
     ],
   };
-  const p = nextSessionPlan(buoi(), [cu], 'https://catch-zkare.ai.studio');
+  const p = nextSessionPlan(makeSession(), [previous], 'https://catch-zkare.ai.studio');
   assert.match(p.description, /SO VỚI BUỔI 20\/08\/2026/);
   assert.match(p.description, /Ngẩng đầu quá cao, hông chìm: 3 → 2 em ↓/);
-  for (const ten of ['Đặng Thuỳ Linh', 'Vũ Minh Khôi', 'Bùi Gia Hân']) {
-    assert.ok(!p.description.includes(ten), `tên buổi cũ lọt ra: ${ten}`);
+  for (const name of ['Đặng Thuỳ Linh', 'Vũ Minh Khôi', 'Bùi Gia Hân']) {
+    assert.ok(!p.description.includes(name), `tên buổi cũ lọt ra: ${name}`);
   }
 });
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MAC_DINH, resolveConfig } from '@/lib/firebase.config';
+import { DEFAULTS, resolveConfig } from '@/lib/firebase.config';
 
 /* Bản deploy do AI Studio dựng lại KHÔNG có .env.local. Nếu chỗ này lùi về một
    apiKey rỗng thì app vẫn dựng xong, vẫn chạy, chỉ là im lặng mất đồng bộ — mà
@@ -9,8 +9,8 @@ import { MAC_DINH, resolveConfig } from '@/lib/firebase.config';
 test('không có biến môi trường thì dùng cấu hình dự án thật', () => {
   const c = resolveConfig({});
   assert.equal(c.projectId, 'catch-64526');
-  assert.equal(c.apiKey, MAC_DINH.apiKey);
-  assert.equal(c.appId, MAC_DINH.appId);
+  assert.equal(c.apiKey, DEFAULTS.apiKey);
+  assert.equal(c.appId, DEFAULTS.appId);
   assert.ok(c.apiKey.length > 0, 'apiKey không bao giờ được rỗng');
 });
 
@@ -20,7 +20,7 @@ test('biến để trống hoặc toàn khoảng trắng cũng không được �
     NEXT_PUBLIC_FIREBASE_API_KEY: '   ',
   });
   assert.equal(c.projectId, 'catch-64526');
-  assert.equal(c.apiKey, MAC_DINH.apiKey);
+  assert.equal(c.apiKey, DEFAULTS.apiKey);
 });
 
 test('biến có giá trị thì đè được — để người fork trỏ sang dự án của họ', () => {
@@ -30,5 +30,5 @@ test('biến có giá trị thì đè được — để người fork trỏ san
   });
   assert.equal(c.projectId, 'du-an-khac');
   assert.equal(c.apiKey, 'khoa-khac');
-  assert.equal(c.authDomain, MAC_DINH.authDomain, 'biến không đặt thì vẫn lùi về mặc định');
+  assert.equal(c.authDomain, DEFAULTS.authDomain, 'biến không đặt thì vẫn lùi về mặc định');
 });

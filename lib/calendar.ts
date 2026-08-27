@@ -6,13 +6,13 @@ const API = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
 
 /** Một buổi phổ cập bơi là bốn mươi lăm phút — con số nằm ngay trong câu mở đầu
  *  của cả dự án. Không bắt thầy gõ lại thứ đã biết. */
-export const PHUT_MOT_BUOI = 45;
+export const SESSION_MINUTES = 45;
 
 /** Nhắc trước nửa tiếng: đủ sớm để thầy còn kịp đọc trên đường ra hồ, đủ muộn
  *  để không bị lẫn vào việc buổi sáng. */
-const NHAC_TRUOC_PHUT = 30;
+const REMIND_BEFORE_MINUTES = 30;
 
-export type KetQuaTaoLich =
+export type CreateEventResult =
   | { ok: true; link: string | null }
   | { ok: false; why: string };
 
@@ -23,14 +23,14 @@ export type KetQuaTaoLich =
  *  nó sống khoảng một giờ và không gia hạn được qua Firebase. Giữ một thẻ hết hạn
  *  rồi dùng lại chỉ tạo ra một lỗi 401 khó hiểu ở lần bấm sau. Mỗi lần tạo nhắc
  *  là một lần xin quyền — đắt hơn một nhịp, nhưng không bao giờ hỏng âm thầm. */
-export async function taoNhacLich(
+export async function createReminder(
   token: string,
   plan: Plan,
-  batDau: Date,
-  phut = PHUT_MOT_BUOI,
-): Promise<KetQuaTaoLich> {
-  const ketThuc = new Date(batDau.getTime() + phut * 60_000);
-  const mui = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Ho_Chi_Minh';
+  start: Date,
+  minutes = SESSION_MINUTES,
+): Promise<CreateEventResult> {
+  const end = new Date(start.getTime() + minutes * 60_000);
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Ho_Chi_Minh';
 
   let res: Response;
   try {
@@ -40,9 +40,9 @@ export async function taoNhacLich(
       body: JSON.stringify({
         summary: plan.title,
         description: plan.description,
-        start: { dateTime: batDau.toISOString(), timeZone: mui },
-        end: { dateTime: ketThuc.toISOString(), timeZone: mui },
-        reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: NHAC_TRUOC_PHUT }] },
+        start: { dateTime: start.toISOString(), timeZone: timeZone },
+        end: { dateTime: end.toISOString(), timeZone: timeZone },
+        reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: REMIND_BEFORE_MINUTES }] },
       }),
     });
   } catch {
@@ -60,8 +60,8 @@ export async function taoNhacLich(
     return { ok: false, why: 'Quyền truy cập lịch đã hết hạn. Bấm lại để xin quyền mới.' };
   }
   if (res.status === 403) {
-    const chiTiet = await res.text().catch(() => '');
-    if (/accessNotConfigured|has not been used|is disabled/i.test(chiTiet)) {
+    const detail = await res.text().catch(() => '');
+    if (/accessNotConfigured|has not been used|is disabled/i.test(detail)) {
       return { ok: false, why: 'Google Calendar API chưa được bật trong dự án Firebase. Xem docs/DEPLOYMENT.md.' };
     }
     return { ok: false, why: 'Thầy chưa cho Catch quyền ghi vào lịch. Bấm lại rồi chọn Cho phép.' };
@@ -74,9 +74,9 @@ export async function taoNhacLich(
 
 /** Ghép ngày (YYYY-MM-DD) với giờ (HH:MM) thành mốc theo giờ máy thầy.
  *  Dựng tay chứ không `new Date('...')` — cùng lý do với `fromISO` trong lib/time.ts. */
-export function ghepMoc(ngayISO: string, gio: string): Date | null {
-  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ngayISO);
-  const t = /^(\d{2}):(\d{2})$/.exec(gio);
+export function combineDateTime(isoDate: string, time: string): Date | null {
+  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+  const t = /^(\d{2}):(\d{2})$/.exec(time);
   if (!d || !t) return null;
   const m = new Date(Number(d[1]), Number(d[2]) - 1, Number(d[3]), Number(t[1]), Number(t[2]), 0, 0);
   return Number.isNaN(m.getTime()) ? null : m;

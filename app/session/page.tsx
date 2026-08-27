@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { PriorityBoard } from '@/components/PriorityBoard';
 import { useSession } from '@/components/useSession';
-import { ngayVN } from '@/lib/time';
+import { formatDate } from '@/lib/time';
 
 export default function SessionPage() {
   const { session, archive, ready, removeEntry, clearEntries, finishSession, exportBackup, importBackup } = useSession();
@@ -14,7 +14,7 @@ export default function SessionPage() {
         <Link href="/" className="text-sm text-dim transition hover:text-aqua">← Về chỗ chấm</Link>
         <h1 className="mt-2 text-2xl font-bold tracking-tight">Thứ tự ưu tiên cho buổi sau</h1>
         <p className="mt-1.5 text-sm text-mist">
-          {session.className ? `Lớp ${session.className}` : 'Chưa đặt tên lớp'} · {ngayVN(session.date)}
+          {session.className ? `Lớp ${session.className}` : 'Chưa đặt tên lớp'} · {formatDate(session.date)}
         </p>
       </header>
 

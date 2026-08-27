@@ -101,7 +101,7 @@ export function saveArchive(list: Session[]): boolean {
  *  quay lại thấy trống là mất đúng thứ Catch hứa.
  *
  *  Gọi một lần lúc mở trang. Không hỏi lại nếu trình duyệt đã đồng ý. */
-export async function keepStorage(): Promise<boolean> {
+export async function requestPersistentStorage(): Promise<boolean> {
   if (typeof navigator === 'undefined' || !navigator.storage?.persist) return false;
   try {
     if (await navigator.storage.persisted?.()) return true;
