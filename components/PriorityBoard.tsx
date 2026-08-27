@@ -6,7 +6,7 @@ import { BY_CODE, SEVERITY_META } from '@/lib/faults';
 import { classProgress, compareWithPrevious } from '@/lib/progress';
 import { CLASS_WIDE, commonFaults, liveFaults, rankEntries, worstSeverity, type Entry, type Session } from '@/lib/session';
 import type { Severity } from '@/lib/types';
-import { mmss } from '@/lib/time';
+import { mmss, ngayVN } from '@/lib/time';
 import type { Backup } from './useSession';
 
 const TONE: Record<Severity, { dot: string; text: string; border: string; bg: string }> = {
@@ -228,7 +228,7 @@ export function PriorityBoard({
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 text-[13px]">
           <button
-            onClick={() => { if (confirm(`Đóng buổi ${session.date} và mở buổi mới? Buổi này được giữ lại để so tiến bộ.`)) onFinish(); }}
+            onClick={() => { if (confirm(`Đóng buổi ${ngayVN(session.date)} và mở buổi mới? Buổi này được giữ lại để so tiến bộ.`)) onFinish(); }}
             className="text-aqua/90 underline decoration-dotted underline-offset-4 transition hover:text-aqua"
           >
             Kết thúc buổi học

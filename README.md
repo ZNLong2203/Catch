@@ -103,6 +103,12 @@ thêm một thứ để bỏ sót.
 **In giáo án buổi sau** ra một tờ giấy cầm được ra bờ hồ, có cả phần tiến bộ và chỗ trống
 để thầy ghi tay. **Lưu ra tệp / Nạp từ tệp** để mang buổi học sang máy khác.
 
+Cài được lên màn hình chính, và **chạy được khi không có mạng** — trừ đúng khâu chấm.
+Không phải để có thêm một cái nhãn: chế độ bờ hồ vốn không gọi máy chủ lần nào, nên thầy
+đứng cạnh hồ trường huyện sóng chập chờn vẫn xem được thứ tự ưu tiên và đánh dấu đã sửa.
+Service worker có một luật cứng: **không bao giờ đệm phản hồi chấm** — một kết quả cũ hiện
+ra cho một em khác là đúng loại sai lầm nguy hiểm nhất của sản phẩm này.
+
 ## Thiết kế an toàn
 
 Một công cụ đứng cạnh con số 2.000 trẻ em thì làm sai chỗ nào cũng có thể góp vào con số đó.
@@ -156,6 +162,14 @@ một nhà vô địch thế giới bơi đúng kỹ thuật, và xem model nào
 
 Với sản phẩm mà thầy sẽ **tin rồi đi sửa cho học sinh**, *không bịa* quan trọng hơn *bắt
 được nhiều*. Cả ba model nhanh đều bắt được ca khó; chỉ một model không lượt nào bịa.
+
+**Hai đường nạp, một phán quyết.** Cùng tám nội dung, nạp một lần bằng URL YouTube và một
+lần bằng tệp tải lên: **8/8 cho đúng cùng kết quả**. Và với hai clip được cắt ra từ giữa
+video gốc, **mốc thời gian dịch đúng theo độ lệch chỗ cắt** — 0:05 và 1:00. Model đang thật
+sự định vị sự việc trong thời gian, không phát ra một con số cố định.
+
+**Video bị xoá — đo được, không phải tự nhận.** Sau tám lượt tải lên, gọi `files.list()`
+trả về rỗng: không tệp nào nằm lại trên máy chủ Google.
 
 **Chấm hai lượt lọc được gì.** Trên một video dài nhiều người, chấm một lượt bốn lần liên
 tiếp cho ra **3 · 3 · 1 · 0 lỗi** — gần như nhiễu. Hai lượt thì ổn định, và loại 2–3 lỗi
@@ -217,7 +231,7 @@ npm run dev
 ```bash
 npm test          # 46 phép kiểm: cổng chặn, giao hai lượt, bảng lỗi, ưu tiên, tiến bộ
 npm run probe     # chạy lại phép thử sống chết trên 7 video công khai
-npm run eval      # bộ đối chứng: chạy lại 7 video mẫu, so với kết quả đã đo
+npm run eval      # bộ đối chứng: 7 ca qua YouTube + 10 ca qua tệp, so với kết quả đã đo
 node private/probe/bench.mjs   # so model trên chính video bơi
 ```
 

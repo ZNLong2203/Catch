@@ -193,11 +193,13 @@ Xem `SAFETY.md` mục 3 để biết vì sao dòng này quan trọng hơn phần
 | Bằng chứng thị giác có cụ thể không? | **Có.** Mô tả được vị trí từng chân, đầu so với mặt nước, khoảng lặng giữa hai chu kỳ tay. |
 | Một lần chấm mất bao lâu? | 5,2s (video ~30 giây) → 37,1s (video 10 phút). |
 | Tốn bao nhiêu token? | 2.520 (video ngắn) → 102.811 (video 10 phút). Tăng theo độ dài ⇒ **phải chặn độ dài tải lên**. |
-| Mốc thời gian lệch bao nhiêu giây? | *chưa đo* — cần người xem lại video và đối chiếu. Đây là ô quan trọng nhất còn trống. |
+| Mốc thời gian có thật sự định vị được sự việc không? | **Có — kiểm chéo hai đường nạp.** Cắt hai video từ giữa (offset 5 s và 60 s) rồi nạp bằng đường tải tệp: mốc **dịch đúng theo độ lệch chỗ cắt** so với khi nạp cùng nội dung bằng URL YouTube. Model đang định vị sự việc trong thời gian, không phát ra số cố định hay ngẫu nhiên. |
+| Mốc có trùng với mắt người không? | *chưa đo* — kiểm chéo ở trên chứng minh tính nhất quán, không chứng minh độ đúng. Vẫn cần một người ngồi xem lại và đối chiếu. |
 | Nhánh từ chối chấm có chạy không? | **Có.** Cố tình khai sai kiểu bơi — đưa video bơi ếch nhưng đánh dấu là bơi trườn sấp — model trả `refused` kèm lý do đúng và hướng dẫn quay lại, không cố chấm bừa. Vẫn *chưa thử* video ngược sáng và quay quá xa. |
 | Model có bị ảnh hưởng bởi lời thoại và chữ trên màn hình không? | *chưa loại trừ.* Video dạy học đều có narration. Dấu hiệu tốt: video đối chứng cũng có bình luận kỹ thuật mà model vẫn không báo lỗi. Cần một video không lời để kết luận. |
-| Đường TẢI TỆP LÊN có chạy không? | **Có.** Đo 26/08 — lần đầu chạy thật: Files API tải lên, chờ `ACTIVE`, chấm, xoá. Mất ~10 giây, chậm hơn đường YouTube (2–3 giây) vì phải chờ Google xử lý tệp. |
-| Video có thật sự bị xoá sau khi chấm không? | **Có, đã kiểm.** Sau ba lượt tải lên, gọi `files.list()` trả về **rỗng** — không tệp nào nằm lại. Lệnh xoá trong `finally` chạy đúng. |
+| Đường TẢI TỆP LÊN có chạy không? | **Có.** Đo 26/08: Files API tải lên, chờ `ACTIVE`, chấm, xoá. Mất 8–11 giây cho clip 20 giây (25 giây với tệp 9 MB), chậm hơn đường YouTube (2–3 giây) vì phải chờ Google xử lý tệp. Vòng chờ `ACTIVE` đã siết từ 1,2 s đều xuống 250 ms dày dần — cắt được 13–24 s còn ~10 s. |
+| Hai đường nạp có cho cùng kết quả không? | **Có, 8/8.** Cùng nội dung nạp bằng URL YouTube và bằng tệp tải lên cho **đúng cùng một phán quyết** — cùng mã lỗi, và cùng cả những ca trả 0 lỗi lẫn ca từ chối chấm. |
+| Video có thật sự bị xoá sau khi chấm không? | **Có, đã kiểm hai lần.** Sau 3 lượt rồi sau 8 lượt tải lên, gọi `files.list()` đều trả về **rỗng** — không tệp nào nằm lại. Lệnh xoá trong `finally` chạy đúng. |
 | Video dọc và video ngang có khác kết quả không? | **Không.** Thử 720×1280 và 1280×720: cả hai đều được xử lý bình thường và cùng rơi vào nhánh từ chối đúng như mong đợi. |
 | Nhánh từ chối có bắt được video không có người bơi không? | **Có.** Ba clip dựng bằng ffmpeg (thanh màu, đồ hoạ trừu tượng, loá trắng) đều bị từ chối kèm lý do đúng: *"chỉ hiển thị thanh màu kiểm tra kỹ thuật, hoàn toàn không có người bơi"*. |
 | Sáu nội dung có chạy được hết không? | **Có.** Đo qua chính API ngày 26/08: đứng nước 4 s · thả nổi 7 s · bơi ếch 2 s · trườn sấp 6 s · bơi ngửa 7 s · bơi bướm 5 s. Danh sách video ở `lib/demos.ts`. |

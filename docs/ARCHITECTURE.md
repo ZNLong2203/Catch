@@ -69,6 +69,8 @@ app/
   session/print/        giáo án buổi sau — nền trắng, cầm ra bờ hồ được
   api/analyze/          nhận video hoặc link, gọi Gemini, xoá tệp, trả Fault[]
   opengraph-image.tsx   ảnh hiện ra khi dán link vào Zalo, Facebook
+  manifest.ts           cài lên màn hình chính
+  icon-192/ icon-512/   biểu tượng sinh bằng next/og lúc build
 lib/
   faults.ts             12 lỗi + phân nhóm đỏ/vàng/xanh + bài sửa  ← linh hồn
   prompt.ts             prompt riêng từng kiểu bơi, sinh từ bảng lỗi
@@ -77,8 +79,10 @@ lib/
   session.ts            buổi học + kho buổi cũ trong localStorage, xếp ưu tiên
   progress.ts           so một em và cả lớp với buổi trước — hàm thuần, có kiểm
   types.ts              Fault, Analysis, Stroke, Severity
+public/
+  sw.js                 service worker — để chế độ bờ hồ chạy được khi mất mạng
 components/
-  Workspace.tsx         điều phối: chọn kiểu bơi → video → soi → ghi vào buổi học
+  Workspace.tsx         điều phối: chọn nội dung → video → soi → ghi vào buổi học
   Review.tsx            thanh thời gian có mốc bấm nhảy được  ← quyết định độ tin
   PriorityBoard.tsx     bảng ưu tiên cả lớp + phần dạy chung
   useSession.ts         đọc/ghi buổi học, đồng bộ giữa các tab
@@ -98,6 +102,27 @@ Cùng một dữ liệu, ba cách bày, vì thầy ở ba trạng thái rất kh
 Chế độ bờ hồ cố ý **bỏ gần hết**: không mốc thời gian, không độ tin cậy, không bằng chứng
 thị giác, và chỉ hiện lỗi đầu tiên. Những thứ đó thuộc về lúc thầy ngồi soi lại. Đứng cạnh
 hồ với ba mươi đứa trẻ đang gọi thì thêm một dòng chữ là thêm một thứ để bỏ sót.
+
+## Chạy được khi không có mạng — và chỗ nào thì không
+
+Thầy đứng cạnh hồ ở trường huyện, sóng chập chờn. Nhưng chế độ bờ hồ **vốn không cần
+mạng**: buổi học nằm hết trong localStorage, không có lệnh gọi máy chủ nào. Chỉ cần vỏ
+ứng dụng nằm trong bộ nhớ đệm là xong.
+
+| Việc | Cần mạng |
+|---|---|
+| Chấm một video | **có** — Gemini nằm ở phía máy chủ |
+| Xem thứ tự ưu tiên, tiến bộ, giáo án | không |
+| Chế độ bờ hồ, đánh dấu đã sửa | không |
+| Lưu ra tệp / nạp từ tệp | không |
+
+Nguyên tắc cứng trong `public/sw.js`: **không bao giờ đệm phản hồi của `/api/analyze`.**
+Một kết quả chấm cũ hiện ra cho một em khác là đúng loại sai lầm nguy hiểm nhất của sản
+phẩm này. Mất mạng thì khâu chấm phải báo hỏng thẳng, không được giả vờ.
+
+Cài lên màn hình chính được (`app/manifest.ts`), có lối tắt thẳng vào chế độ bờ hồ. Thể lệ
+cuộc thi cho triển khai lên Cloud Run **hoặc Play Store**; PWA là bước đệm để về sau đóng
+gói lên Play Store bằng TWA mà không phải viết lại gì.
 
 ## Vì sao buổi học nằm ở trình duyệt chứ không ở Firestore
 

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
+import { RegisterSW } from '@/components/RegisterSW';
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
     + 'bấm vào xem lại được, và xếp thứ tự em nào cần thầy sửa trước — theo rủi ro '
     + 'đuối nước, không theo mức xấu của động tác.',
   applicationName: 'Catch',
+  appleWebApp: { capable: true, title: 'Catch', statusBarStyle: 'black-translucent' },
   openGraph: {
     type: 'website',
     locale: 'vi_VN',
@@ -50,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased">
         <a href="#lam-viec" className="link-skip">Bỏ qua, tới thẳng chỗ làm việc</a>
         {children}
+        <RegisterSW />
       </body>
     </html>
   );
