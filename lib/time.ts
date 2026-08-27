@@ -37,7 +37,7 @@ export function ngayVNNgan(iso: string, now = new Date()): string {
   if (!d) return iso;
   const homNay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const days = Math.round((d.getTime() - homNay.getTime()) / 86_400_000);
-  const dau = days === 0 ? 'Hôm nay' : days === -1 ? 'Hôm qua' : THU[d.getDay()];
+  const dau = days === 0 ? 'Hôm nay' : days === -1 ? 'Hôm qua' : days === 1 ? 'Ngày mai' : THU[d.getDay()];
   const ngay = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
   return `${dau} · ${ngay}${d.getFullYear() === now.getFullYear() ? '' : `/${d.getFullYear()}`}`;
 }

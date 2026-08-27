@@ -68,7 +68,11 @@ export function watchUser(cb: (u: User | null) => void): () => void {
   });
 }
 
-export type LinkResult = { ok: true; switched: boolean } | { ok: false; why: string };
+export const SCOPE_LICH = 'https://www.googleapis.com/auth/calendar.events';
+
+export type LinkResult =
+  | { ok: true; switched: boolean; token?: string }
+  | { ok: false; why: string };
 
 /** Nâng tài khoản ẩn danh lên tài khoản Google.
  *
@@ -76,28 +80,39 @@ export type LinkResult = { ok: true; switched: boolean } | { ok: false; why: str
  *  không nối được và Catch đăng nhập thẳng vào nó. Buổi đang chấm dở trên máy
  *  này sẽ nhường chỗ cho dữ liệu cũ — giao diện phải nói trước, không được để
  *  thầy mất buổi mà không biết vì sao. */
-export async function linkGoogle(): Promise<LinkResult> {
+export async function linkGoogle(scopes: string[] = []): Promise<LinkResult> {
   const a = getAuthClient();
   if (!a) return { ok: false, why: 'Chưa cấu hình Firebase.' };
   const provider = new GoogleAuthProvider();
+  scopes.forEach((s) => provider.addScope(s));
+  /* Xin quyền mới thì phải buộc hiện lại màn hình đồng ý. Không có dòng này,
+     Google thấy thầy đã đăng nhập rồi nên trả về ngay một thẻ CŨ — thẻ đó không
+     có quyền lịch, và lỗi chỉ lộ ra ở lần gọi API, xa chỗ gây ra nó. */
+  if (scopes.length > 0) provider.setCustomParameters({ prompt: 'consent' });
   const u = a.currentUser;
   try {
     if (u?.isAnonymous) {
-      await linkWithPopup(u, provider);
-      return { ok: true, switched: false };
+      const res = await linkWithPopup(u, provider);
+      return { ok: true, switched: false, token: GoogleAuthProvider.credentialFromResult(res)?.accessToken };
     }
-    await signInWithPopup(a, provider);
-    return { ok: true, switched: false };
+    const res = await signInWithPopup(a, provider);
+    return { ok: true, switched: false, token: GoogleAuthProvider.credentialFromResult(res)?.accessToken };
   } catch (e) {
     const code = (e as { code?: string })?.code ?? '';
     if (code === 'auth/credential-already-in-use' || code === 'auth/email-already-in-use') {
       try {
-        await signInWithPopup(a, provider);
-        return { ok: true, switched: true };
+        const res = await signInWithPopup(a, provider);
+        return { ok: true, switched: true, token: GoogleAuthProvider.credentialFromResult(res)?.accessToken };
       } catch { return { ok: false, why: 'Đăng nhập không xong. Thử lại.' }; }
     }
     if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
       return { ok: false, why: '' };
+    }
+    if (code === 'auth/popup-blocked') {
+      return { ok: false, why: 'Trình duyệt chặn cửa sổ đăng nhập. Cho phép cửa sổ bật lên rồi thử lại.' };
+    }
+    if (code === 'auth/unauthorized-domain') {
+      return { ok: false, why: 'Tên miền này chưa được cho phép trong Firebase Console → Authentication → Settings → Authorized domains.' };
     }
     return { ok: false, why: 'Đăng nhập không xong. Kiểm tra kết nối rồi thử lại.' };
   }

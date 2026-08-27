@@ -72,6 +72,35 @@ gcloud run deploy catch \
 `lib/gemini.server.ts` tự đặt trần chịu đựng 110 giây kèm thử lại. Để timeout mặc định
 60 giây thì video dài sẽ bị cắt giữa chừng.
 
+## Google Calendar — ba việc trong Console, thiếu là hỏng
+
+Nút *Nhắc vào Google Calendar* ở bảng ưu tiên gọi thẳng Calendar API bằng thẻ truy
+cập lấy từ lần đăng nhập Google của thầy. Ba thứ phải bật sẵn, và cả ba đều **im
+lặng cho tới lúc có người bấm nút**:
+
+1. **Bật Google Calendar API** trong dự án `catch-64526` (số hiệu 676963947701):
+   Google Cloud Console → APIs & Services → Library → *Google Calendar API* → Enable.
+   Chưa bật thì Catch trả về đúng câu *"Google Calendar API chưa được bật"* — đã có
+   phép thử canh câu đó, nên nếu thấy nó thì đây là chỗ cần sửa.
+
+2. **Khai quyền trong màn hình đồng ý OAuth**: APIs & Services → OAuth consent screen
+   → Data access → thêm `https://www.googleapis.com/auth/calendar.events`.
+
+3. **Thêm người dùng thử**: cùng màn hình, mục *Audience* → Test users → thêm tài
+   khoản Google sẽ dùng để demo. Ở trạng thái *Testing* chỉ những tài khoản trong
+   danh sách này mới bấm qua được.
+
+### Cảnh báo "Google hasn't verified this app" — biết trước để khỏi hoảng
+
+`calendar.events` là **quyền nhạy cảm**. Muốn hết cảnh báo thì phải qua duyệt xét của
+Google, mất vài tuần. Trong thời gian đó, người bấm nút sẽ thấy màn hình cảnh báo và
+phải bấm *Advanced → Go to Catch (unsafe)*.
+
+Đây là chuyện đã biết trước khi làm, không phải lỗi cấu hình. Nếu quay video demo có
+cảnh này thì **nói thẳng ra một câu** — giấu đi rồi để giám khảo tự bắt gặp thì tệ hơn
+nhiều. Đăng nhập thường và toàn bộ phần chấm KHÔNG dính cảnh báo này; chỉ riêng nút
+nhắc lịch.
+
 ## Hạn mức Gemini — rủi ro thật cho ngày demo
 
 Đo ngày 26/08: chạy bộ đối chứng bảy video ba lượt mỗi cái là **cạn hạn mức bậc miễn phí**

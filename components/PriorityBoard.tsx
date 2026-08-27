@@ -7,6 +7,7 @@ import { classProgress, compareWithPrevious } from '@/lib/progress';
 import { CLASS_WIDE, commonFaults, liveFaults, rankEntries, worstSeverity, type Entry, type Session } from '@/lib/session';
 import type { Severity } from '@/lib/types';
 import { mmss, ngayVN } from '@/lib/time';
+import { CalendarReminder } from './CalendarReminder';
 import type { Backup } from './useSession';
 
 const TONE: Record<Severity, { dot: string; text: string; border: string; bg: string }> = {
@@ -69,7 +70,7 @@ function EntryRow({
           {/* So với chính em này ở buổi trước */}
           {progress && (progress.fixed.length > 0 || progress.appeared.length > 0) && (
             <p className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-t border-line/60 pt-2.5 text-xs">
-              <span className="text-dim">so với buổi {progress.previousDate}:</span>
+              <span className="text-dim">so với buổi {ngayVN(progress.previousDate)}:</span>
               {progress.fixed.map((c) => (
                 <span key={c} className="rounded-md bg-calm/10 px-1.5 py-0.5 text-calm">
                   hết · {BY_CODE.get(c)!.label}
@@ -151,7 +152,7 @@ export function PriorityBoard({
       {/* ── Việc dạy hôm trước có ăn thua không ── */}
       {progress.length > 0 && (
         <section className="card border-calm/25 bg-calm/[0.04] p-5">
-          <h2 className="text-base font-semibold tracking-tight text-calm">So với buổi {progress[0].previousDate}</h2>
+          <h2 className="text-base font-semibold tracking-tight text-calm">So với buổi {ngayVN(progress[0].previousDate)}</h2>
           <p className="mt-1.5 text-[13px] leading-relaxed text-mist">
             Đây là câu mà chấm từng buổi rời rạc không nói được: thứ thầy dạy buổi trước có ăn thua gì không.
           </p>
@@ -224,6 +225,9 @@ export function PriorityBoard({
           <Link href="/session/print" className="rounded-xl border border-line bg-surface/60 px-4 py-2.5 text-sm font-medium transition hover:border-aqua/35 hover:bg-surface">
             In giáo án buổi sau
           </Link>
+          {/* Tờ giấy in ra cầm được ra bờ hồ; cái này lo phần thầy nhớ mở nó ra
+              trước buổi sau. Hai đường thoát khác nhau cho hai kiểu quên. */}
+          <CalendarReminder session={session} archive={archive} />
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 text-[13px]">

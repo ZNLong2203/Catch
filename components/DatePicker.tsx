@@ -18,11 +18,14 @@ import { fromISO, ngayVN, ngayVNNgan, toISO } from '@/lib/time';
  *  và cái duy nhất một ngày tương lai làm được là làm hỏng thứ tự khi so tiến
  *  bộ giữa các buổi. */
 export function DatePicker({
-  value, onChange, className,
+  value, onChange, className, huong = 'da-qua',
 }: {
   value: string;
   onChange: (iso: string) => void;
   className?: string;
+  /** `da-qua` — chỉ cho chọn hôm nay trở về trước (chấm buổi đã xảy ra).
+   *  `sap-toi` — chỉ cho chọn hôm nay trở đi (hẹn buổi sau). */
+  huong?: 'da-qua' | 'sap-toi';
 }) {
   const [open, setOpen] = useState(false);
   const selected = fromISO(value);
@@ -51,7 +54,7 @@ export function DatePicker({
           selected={selected}
           defaultMonth={selected ?? today}
           onSelect={(d) => { if (d) { onChange(toISO(d)); setOpen(false); } }}
-          disabled={{ after: today }}
+          disabled={huong === 'da-qua' ? { after: today } : { before: today }}
           autoFocus
         />
         <div className="flex items-center justify-between gap-2 border-t border-line px-3 py-2">
@@ -66,13 +69,13 @@ export function DatePicker({
             type="button"
             onClick={() => {
               const d = new Date(today);
-              d.setDate(d.getDate() - 1);
+              d.setDate(d.getDate() + (huong === 'da-qua' ? -1 : 7));
               onChange(toISO(d));
               setOpen(false);
             }}
             className="rounded-md px-2 py-1 text-xs font-medium text-mist transition-colors hover:bg-raised"
           >
-            Hôm qua
+            {huong === 'da-qua' ? 'Hôm qua' : 'Tuần sau'}
           </button>
         </div>
       </PopoverContent>
