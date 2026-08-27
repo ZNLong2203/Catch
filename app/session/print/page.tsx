@@ -36,7 +36,7 @@ export default function PrintPage() {
         <header className="border-b-2 border-black pb-4">
           <h1 className="text-2xl font-bold">Giáo án buổi sau</h1>
           <p className="mt-1 text-sm text-slate-700">
-            {session.className ? `Lớp ${session.className}` : 'Lớp ______'} · buổi ngày {formatDate(session.date)}
+            {session.className ? `Lớp ${session.className}` : 'Lớp ______'}{ready && ` · buổi ngày ${formatDate(session.date)}`}
             {session.entries[0] && ` · ${SKILL_META[session.entries[0].skill].label}`}
             {' · '}{session.entries.length} em
           </p>

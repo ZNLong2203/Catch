@@ -14,7 +14,7 @@ export default function SessionPage() {
         <Link href="/" className="text-sm text-dim transition hover:text-aqua">← Về chỗ chấm</Link>
         <h1 className="mt-2 text-2xl font-bold tracking-tight">Thứ tự ưu tiên cho buổi sau</h1>
         <p className="mt-1.5 text-sm text-mist">
-          {session.className ? `Lớp ${session.className}` : 'Chưa đặt tên lớp'} · {formatDate(session.date)}
+          {session.className ? `Lớp ${session.className}` : 'Chưa đặt tên lớp'}{ready && ` · ${formatDate(session.date)}`}
         </p>
       </header>
 

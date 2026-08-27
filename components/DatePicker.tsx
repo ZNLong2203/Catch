@@ -18,11 +18,18 @@ import { fromISO, formatDate, formatDateRelative, toISO } from '@/lib/time';
  *  và cái duy nhất một ngày tương lai làm được là làm hỏng thứ tự khi so tiến
  *  bộ giữa các buổi. */
 export function DatePicker({
-  value, onChange, className, direction = 'past',
+  value, onChange, className, direction = 'past', ready = true,
 }: {
   value: string;
   onChange: (iso: string) => void;
   className?: string;
+  /** Trình duyệt đã đọc xong buổi học chưa.
+   *
+   *  Trang chủ là trang TĨNH, dựng sẵn lúc build. Vẽ ngày ra ở lượt đầu nghĩa là
+   *  nướng ngày-lúc-build vào HTML rồi phục vụ cho mọi người: hôm sau mở lên vẫn
+   *  thấy "Hôm nay · 27/08". `suppressHydrationWarning` chỉ giấu cảnh báo, không
+   *  sửa được cái HTML sai. Nên lượt đầu giữ chỗ, có số thật rồi mới vẽ. */
+  ready?: boolean;
   /** `past` — chỉ cho chọn hôm nay trở về trước (chấm buổi đã xảy ra).
    *  `future` — chỉ cho chọn hôm nay trở đi (hẹn buổi sau). */
   direction?: 'past' | 'future';
@@ -35,7 +42,8 @@ export function DatePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        aria-label={`Ngày học: ${formatDate(value)}`}
+        aria-label={ready ? `Ngày học: ${formatDate(value)}` : 'Ngày học'}
+        disabled={!ready}
         className={cn(
           'flex items-center gap-2 whitespace-nowrap rounded-lg border border-line bg-deep px-2.5 py-1.5 text-sm',
           'transition-colors hover:border-aqua/40 data-[state=open]:border-aqua/50',
@@ -43,7 +51,9 @@ export function DatePicker({
         )}
       >
         <CalendarIcon aria-hidden className="size-4 shrink-0 text-dim" />
-        <span suppressHydrationWarning className="tabular-nums">{formatDateRelative(value, now)}</span>
+        <span className={cn('tabular-nums', !ready && 'invisible')}>
+          {ready ? formatDateRelative(value, now) : 'Hôm nay · 00/00'}
+        </span>
         <ChevronDownIcon aria-hidden className="size-3.5 shrink-0 text-dim" />
       </PopoverTrigger>
 

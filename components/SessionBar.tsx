@@ -40,7 +40,7 @@ export function SessionBar({
 
         <div className="flex items-center gap-2">
           <span className="eyebrow shrink-0">Buổi</span>
-          <DatePicker value={session.date} onChange={(date) => onChange({ date })} />
+          <DatePicker value={session.date} onChange={(date) => onChange({ date })} ready={ready} />
         </div>
       </div>
 
