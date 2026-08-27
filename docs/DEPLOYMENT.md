@@ -122,9 +122,18 @@ gcloud run deploy catch \
 `lib/gemini.server.ts` tự đặt trần chịu đựng 110 giây kèm thử lại. Để timeout mặc định
 60 giây thì video dài sẽ bị cắt giữa chừng.
 
-## Google Calendar — ba việc trong Console, thiếu là hỏng
+## Google Calendar — đã dựng xong, đang TẮT
 
-Nút *Nhắc vào Google Calendar* ở bảng ưu tiên gọi thẳng Calendar API bằng thẻ truy
+**Trạng thái hôm nay: nút không có trên giao diện.** `components/CalendarReminder.tsx`
+vẫn còn nguyên và vẫn được phủ bởi bảy phép thử, nhưng không được gắn vào bảng ưu tiên.
+
+Lý do nằm ở mục *"Google hasn't verified this app"* bên dưới: quyền lịch là quyền nhạy
+cảm, chưa duyệt xét thì mọi người bấm vào đều đâm vào một màn hình cảnh báo bảo mật.
+Với sản phẩm này, cái giá đó lớn hơn tiện ích.
+
+Phần dưới đây là **việc phải làm khi bật lại** — sau khi Google duyệt xét xong.
+
+Nút *Nhắc vào Google Calendar* gọi thẳng Calendar API bằng thẻ truy
 cập lấy từ lần đăng nhập Google của thầy. Ba thứ phải bật sẵn, và cả ba đều **im
 lặng cho tới lúc có người bấm nút**:
 

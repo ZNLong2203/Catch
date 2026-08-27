@@ -7,7 +7,6 @@ import { classProgress, compareWithPrevious } from '@/lib/progress';
 import { CLASS_WIDE, commonFaults, liveFaults, rankEntries, worstSeverity, type Entry, type Session } from '@/lib/session';
 import type { Severity } from '@/lib/types';
 import { mmss, formatDate } from '@/lib/time';
-import { CalendarReminder } from './CalendarReminder';
 import type { Backup } from './useSession';
 
 const TONE: Record<Severity, { dot: string; text: string; border: string; bg: string }> = {
@@ -225,9 +224,9 @@ export function PriorityBoard({
           <Link href="/session/print" className="rounded-xl border border-line bg-surface/60 px-4 py-2.5 text-sm font-medium transition hover:border-aqua/35 hover:bg-surface">
             In giáo án buổi sau
           </Link>
-          {/* Tờ giấy in ra cầm được ra bờ hồ; cái này lo phần thầy nhớ mở nó ra
-              trước buổi sau. Hai đường thoát khác nhau cho hai kiểu quên. */}
-          <CalendarReminder session={session} archive={archive} />
+          {/* Nút "Nhắc vào Google Calendar" từng đứng ở đây và đã được gỡ có chủ ý —
+              KHÔNG phải quên gắn. Mã vẫn còn nguyên trong components/CalendarReminder.tsx,
+              đọc chú thích đầu tệp đó để biết vì sao. */}
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 text-[13px]">

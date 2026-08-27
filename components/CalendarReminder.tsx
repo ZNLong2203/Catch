@@ -11,6 +11,21 @@ import { toISO } from '@/lib/time';
 
 /** Đưa việc của buổi sau vào lịch của thầy.
  *
+ *  ⚠️ HIỆN KHÔNG ĐƯỢC GẮN VÀO GIAO DIỆN. Cố ý, không phải sót.
+ *
+ *  Quyền `calendar.events` là quyền nhạy cảm của Google. Chưa qua duyệt xét thì
+ *  màn hình đồng ý hiện *"Google hasn't verified this app"* và bắt người dùng bấm
+ *  *Advanced → Go to Catch (unsafe)*. Duyệt xét mất vài tuần.
+ *
+ *  Với một sản phẩm lấy an toàn trẻ em làm gốc, dựng một màn hình cảnh báo bảo mật
+ *  chắn giữa đường đắt hơn nhiều so với tiện ích mà cái nhắc này mang lại. Nên nút
+ *  được gỡ khỏi bảng ưu tiên, còn mã thì giữ nguyên — kể cả bảy phép thử trong
+ *  test/calendar.test.ts.
+ *
+ *  Gắn lại: thêm `<CalendarReminder session={session} archive={archive} />` vào
+ *  hàng nút trong PriorityBoard, sau khi Google duyệt xét xong. Ba việc phải bật
+ *  trong Console nằm ở docs/DEPLOYMENT.md.
+ *
  *  Nội dung do `lib/plan.ts` dựng, và tệp đó có luật cứng: không tên em, không
  *  lỗi của từng em. Xem chú thích ở đó để biết vì sao — tóm tắt: lịch rò rỉ dễ
  *  hơn hẳn cơ sở dữ liệu có luật đứng gác.
