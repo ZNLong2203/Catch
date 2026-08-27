@@ -1,3 +1,4 @@
+import { Brand } from '@/components/Brand';
 import { Workspace } from '@/components/Workspace';
 import { hasKey } from '@/lib/gemini.server';
 
@@ -5,18 +6,7 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-6xl px-5 pb-24 pt-8 sm:px-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          {/* Dấu hiệu nhận diện: hai vệt nước và một chấm — chấm là cái Catch bắt được */}
-          <svg viewBox="0 0 36 24" aria-hidden className="h-6 w-9 text-aqua" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-            <path d="M2 9c3.2-4 6-4 9 0s5.8 4 9 0 6-4 9 0" opacity=".55" />
-            <path d="M2 16c3.2-4 6-4 9 0s5.8 4 9 0 6-4 9 0" opacity=".3" />
-            <circle cx="20" cy="9" r="2.6" fill="currentColor" stroke="none" />
-          </svg>
-          <div>
-            <p className="text-[17px] font-bold leading-none tracking-tight">Catch</p>
-            <p className="mt-1 text-xs text-dim">Trợ giảng cho lớp phổ cập bơi</p>
-          </div>
-        </div>
+        <Brand tagline />
         <p className="rounded-full border border-line bg-deep/60 px-3 py-1.5 text-[11px] text-mist">
           #BuildwithGoogleAI · AI Riser Vietnam 2026
         </p>

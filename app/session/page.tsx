@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Brand } from '@/components/Brand';
 import { PriorityBoard } from '@/components/PriorityBoard';
 import { useSession } from '@/components/useSession';
 import { formatDate } from '@/lib/time';
@@ -11,8 +12,11 @@ export default function SessionPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 pb-24 pt-8 sm:px-8">
       <header className="mb-8">
-        <Link href="/" className="text-sm text-dim transition hover:text-aqua">← Về chỗ chấm</Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight">Thứ tự ưu tiên cho buổi sau</h1>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <Brand />
+          <Link href="/" className="text-sm text-dim transition hover:text-aqua">← Về chỗ chấm</Link>
+        </div>
+        <h1 className="mt-6 text-2xl font-bold tracking-tight">Thứ tự ưu tiên cho buổi sau</h1>
         <p className="mt-1.5 text-sm text-mist">
           {session.className ? `Lớp ${session.className}` : 'Chưa đặt tên lớp'}{ready && ` · ${formatDate(session.date)}`}
         </p>
