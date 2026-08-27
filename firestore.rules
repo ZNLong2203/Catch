@@ -6,8 +6,14 @@ rules_version = '2';
 // cơ thể em dưới nước. Nên luật viết theo hướng đóng: KHÔNG có đường nào đọc
 // được dữ liệu của người khác, kể cả đọc nhầm.
 //
-// Triển khai:
-//     firebase deploy --only firestore:rules
+// Triển khai — LUÔN kèm --project, đừng bao giờ chạy trần:
+//     npm run rules
+//
+// Tài khoản này có bốn dự án Firebase (Catch, Verso, BookingApp, SocketEvo).
+// Một lệnh `firebase deploy` không nêu dự án sẽ bắn vào bất kỳ dự án nào đang
+// được chọn — và ghi đè luật của một dự án khác đang chạy thật là chuyện không
+// có nút hoàn tác. `.firebaserc` ghim mặc định về catch-64526, `npm run rules`
+// ghim thêm lần nữa bằng --project. Hai lớp, cố ý.
 //
 // Không deploy luật này thì dự án đang chạy ở chế độ mặc định của Firebase —
 // hoặc khoá sạch, hoặc mở toang tuỳ lúc tạo. Cả hai đều sai.
