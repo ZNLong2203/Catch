@@ -14,6 +14,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Địa chỉ công khai bị nướng vào thẻ og:image LÚC BUILD — trang chủ là trang dựng
+# sẵn, và trên Cloud Run `req.url` chỉ là 0.0.0.0:8080 của container. Bỏ trống thì
+# app/layout.tsx lùi về địa chỉ AI Studio, vẫn là một địa chỉ thật.
+ARG NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+
 RUN npm run build
 
 # ── Chạy ─────────────────────────────────────────────────────

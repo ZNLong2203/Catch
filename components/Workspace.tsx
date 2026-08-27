@@ -21,6 +21,11 @@ const LOI_TIENG_VIET: Record<string, string> = {
   BI_CHAN_AN_TOAN: 'Yêu cầu bị bộ lọc an toàn của Gemini chặn.',
   QUA_TAI: 'Gemini đang quá tải nên chấm không kịp. Chờ một lát rồi thử lại — video của thầy vẫn còn đây.',
   THIEU_NOI_DUNG: 'Chưa chọn nội dung cần chấm.',
+  THIEU_VIDEO: 'Chưa có video để chấm. Chọn lại tệp hoặc dán đường dẫn YouTube.',
+  /* Máy chủ không đọc nổi biểu mẫu gửi lên — gần như luôn là mạng đứt giữa chừng
+     lúc đang tải video. Nói đúng nguyên nhân, vì cách xử của thầy khác hẳn: đứng
+     gần cục phát wifi hơn rồi gửi lại, chứ không phải chờ. */
+  THAN_HONG: 'Tải video lên không xong — thường là do mạng đứt giữa chừng. Kiểm tra sóng rồi gửi lại.',
   LOI_CHAM: 'Chấm không xong. Thử lại sau một lát.',
 };
 

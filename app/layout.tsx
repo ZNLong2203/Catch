@@ -12,13 +12,18 @@ const beVietnam = Be_Vietnam_Pro({
 
 /** Địa chỉ công khai chính thức.
  *
- *  Ghi cứng, KHÔNG đọc từ biến môi trường: trang chủ là trang dựng sẵn lúc build,
- *  nên địa chỉ nào có mặt lúc đó sẽ bị nướng thẳng vào thẻ og:image. Trên Cloud Run
- *  `req.url` là 0.0.0.0:8080 của chính container, dùng nó thì ảnh chia sẻ trỏ vào
- *  hư không.
+ *  Trang chủ là trang dựng sẵn lúc build, nên địa chỉ nào có mặt lúc đó sẽ bị nướng
+ *  thẳng vào thẻ og:image. Trên Cloud Run `req.url` là 0.0.0.0:8080 của chính
+ *  container, dùng nó thì ảnh chia sẻ trỏ vào hư không — nên không đọc từ request.
  *
- *  ⚠️ Sửa dòng này ngay sau khi deploy lần đầu, trước khi dán link đi đâu. */
-const SITE = 'https://catch.example.run.app';
+ *  Đọc từ biến môi trường LÚC BUILD, và luôn có sẵn một địa chỉ thật để lùi về.
+ *  Không bao giờ để giá trị giữ chỗ ở đây: một tên miền không tồn tại thì thẻ
+ *  chia sẻ lên LinkedIn hay Facebook hiện ra một ô ảnh vỡ, và đó đúng là chỗ
+ *  người lạ nhìn thấy dự án lần đầu.
+ *
+ *  Deploy lên Cloud Run thì truyền địa chỉ .run.app vào lúc build:
+ *      docker build --build-arg NEXT_PUBLIC_SITE_URL=https://... */
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://catch-zkare.ai.studio';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),

@@ -19,7 +19,7 @@ export function SessionBar({
 
   return (
     <div className="card flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
-      <div className="flex items-center gap-x-3.5 whitespace-nowrap">
+      <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2.5 whitespace-nowrap">
         <label className="flex items-center gap-2">
           <span className="eyebrow shrink-0">Lớp</span>
           <input
@@ -31,7 +31,7 @@ export function SessionBar({
           />
         </label>
 
-        <span aria-hidden className="h-6 w-px shrink-0 bg-line" />
+        <span aria-hidden className="hidden h-6 w-px shrink-0 bg-line sm:block" />
 
         <div className="flex items-center gap-2">
           <span className="eyebrow shrink-0">Buổi</span>
@@ -39,7 +39,7 @@ export function SessionBar({
         </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-3 whitespace-nowrap">
+      <div className="ml-auto flex flex-wrap items-center justify-end gap-x-3 gap-y-2 whitespace-nowrap">
         <span className="text-sm text-mist" aria-live="polite">
           {ready ? (n === 0 ? 'chưa chấm em nào' : `${n} em đã chấm`) : ' '}
         </span>
