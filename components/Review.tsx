@@ -251,8 +251,25 @@ export function Review({
                 controls
                 playsInline
                 className="aspect-video w-full bg-black"
-                onLoadedMetadata={(e) => setLocal((t) => ({ ...t, duration: e.currentTarget.duration || t.duration }))}
-                onTimeUpdate={(e) => setLocal((t) => ({ ...t, current: e.currentTarget.currentTime }))}
+                /* Đọc số ra biến NGAY trong hàm bắt sự kiện, rồi mới gọi setLocal.
+                 *
+                 *  Hàm cập nhật truyền vào setLocal không chạy ngay — React để dành
+                 *  tới lượt dựng sau. Mà ngay khi hàm bắt sự kiện trả về, React đã
+                 *  gán `e.currentTarget = null` (nó đổi theo từng chặng lan sự kiện,
+                 *  giữ lại là sai). Nên đọc `e.currentTarget.currentTime` bên trong
+                 *  hàm cập nhật là đọc thuộc tính của null.
+                 *
+                 *  Hậu quả không phải một dòng cảnh báo: video vừa chạy được một
+                 *  nhịp là onTimeUpdate bắn, cả màn hình soi sập xuống trang "Có gì
+                 *  đó hỏng". Thầy vừa chờ Gemini chấm xong thì mất sạch kết quả. */
+                onLoadedMetadata={(e) => {
+                  const d = e.currentTarget.duration;
+                  setLocal((t) => ({ ...t, duration: d || t.duration }));
+                }}
+                onTimeUpdate={(e) => {
+                  const c = e.currentTarget.currentTime;
+                  setLocal((t) => ({ ...t, current: c }));
+                }}
               />
             )}
           </div>
