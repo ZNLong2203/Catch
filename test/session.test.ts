@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CLASS_WIDE, commonFaults, liveFaults, rankEntries, worstSeverity, type Entry } from '@/lib/session';
+import {
+  CLASS_WIDE, commonFaults, emptySession, liveFaults, rankEntries, saveArchive, saveSession,
+  worstSeverity, type Entry,
+} from '@/lib/session';
 import type { Fault, FaultCode } from '@/lib/types';
 
 let seq = 0;
@@ -82,4 +85,33 @@ test('ngưỡng dạy chung là một phần ba lớp', () => {
 test('lớp rỗng không làm sập bảng ưu tiên', () => {
   assert.deepEqual(commonFaults([]), []);
   assert.deepEqual(rankEntries([]), []);
+});
+
+/* ── Ghi hỏng phải nói ra, không được nuốt ──────────────────────────────
+   Thầy chấm ba mươi em rồi mở bảng ưu tiên thấy trống là kiểu hỏng tệ nhất
+   sản phẩm này có thể mắc. Hai phép thử này khoá lại đường đó. */
+
+const withStorage = (setItem: () => void, run: () => void) => {
+  const g = globalThis as { window?: unknown };
+  const truoc = g.window;
+  g.window = { localStorage: { setItem, getItem: () => null } };
+  try { run(); } finally { if (truoc === undefined) delete g.window; else g.window = truoc; }
+};
+
+test('saveSession: báo false khi trình duyệt chặn lưu trữ', () => {
+  withStorage(() => { throw new Error('QuotaExceededError'); }, () => {
+    assert.equal(saveSession(emptySession('4A')), false);
+  });
+});
+
+test('saveSession: báo true khi ghi được', () => {
+  withStorage(() => {}, () => {
+    assert.equal(saveSession(emptySession('4A')), true);
+  });
+});
+
+test('saveArchive: báo false khi trình duyệt chặn lưu trữ', () => {
+  withStorage(() => { throw new Error('QuotaExceededError'); }, () => {
+    assert.equal(saveArchive([emptySession('4A')]), false);
+  });
 });

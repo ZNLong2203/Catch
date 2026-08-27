@@ -58,9 +58,16 @@ export function loadSession(): Session {
   }
 }
 
-export function saveSession(s: Session) {
-  if (typeof window === 'undefined') return;
-  try { window.localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* hết chỗ hoặc bị chặn */ }
+/** Trả về `false` khi ghi hỏng — và chỗ gọi PHẢI xử lý.
+ *
+ *  Nuốt lỗi ở đây là kiểu hỏng tệ nhất mà sản phẩm này có thể mắc: thầy chấm ba
+ *  mươi em suốt bốn mươi lăm phút, không có dấu hiệu gì bất thường, tới lúc mở
+ *  bảng ưu tiên thì trống trơn. Trình duyệt chặn lưu trữ (Safari riêng tư, thiết
+ *  bị của trường khoá sẵn) là chuyện có thật, không phải giả định. */
+export function saveSession(s: Session): boolean {
+  if (typeof window === 'undefined') return true;
+  try { window.localStorage.setItem(KEY, JSON.stringify(s)); return true; }
+  catch { return false; }
 }
 
 /* ── Buổi cũ ─────────────────────────────────────────────────────────────
@@ -76,10 +83,27 @@ export function loadArchive(): Session[] {
   } catch { return []; }
 }
 
-export function saveArchive(list: Session[]) {
-  if (typeof window === 'undefined') return;
-  try { window.localStorage.setItem(ARCHIVE_KEY, JSON.stringify(list.slice(-KEEP))); }
-  catch { /* hết chỗ — buổi cũ nhất sẽ rụng dần, chấp nhận được */ }
+export function saveArchive(list: Session[]): boolean {
+  if (typeof window === 'undefined') return true;
+  try { window.localStorage.setItem(ARCHIVE_KEY, JSON.stringify(list.slice(-KEEP))); return true; }
+  catch { return false; }
+}
+
+/** Xin trình duyệt giữ chỗ lưu trữ này lại, đừng dọn khi máy hết đĩa.
+ *
+ *  Mặc định localStorage là loại "được thì giữ" — trình duyệt có quyền dọn bất
+ *  cứ lúc nào, và Safari dọn sạch dữ liệu do script ghi sau bảy ngày không mở
+ *  trang. Một khoá phổ cập bơi kéo mười tới mười lăm buổi qua nhiều tuần, mà
+ *  phần so tiến bộ giữa các buổi sống bằng kho buổi cũ — nghỉ hè một tuần rồi
+ *  quay lại thấy trống là mất đúng thứ Catch hứa.
+ *
+ *  Gọi một lần lúc mở trang. Không hỏi lại nếu trình duyệt đã đồng ý. */
+export async function keepStorage(): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.storage?.persist) return false;
+  try {
+    if (await navigator.storage.persisted?.()) return true;
+    return await navigator.storage.persist();
+  } catch { return false; }
 }
 
 /** Lỗi còn hiệu lực của một em — đã trừ những lỗi thầy phủ quyết. */

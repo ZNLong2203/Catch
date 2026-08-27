@@ -71,6 +71,19 @@ câu trả lời cho cả bốn câu hỏi đó là *không ai ngoài thầy*.
 Cái giá phải trả, nói thẳng: đổi máy là mất buổi học, và hai thầy không chia sẻ được cho nhau.
 Nút **In giáo án buổi sau** là đường thoát — thứ cần giữ lại thì in ra giấy.
 
+Chọn localStorage thì phải gánh hai chỗ yếu của nó, và cả hai đều phải xử bằng code chứ
+không phải bằng hy vọng:
+
+- **Trình duyệt được quyền dọn.** localStorage mặc định là loại *được thì giữ*. Safari xoá
+  sạch dữ liệu do script ghi sau bảy ngày không mở trang, mà một khoá phổ cập bơi kéo mười
+  tới mười lăm buổi qua nhiều tuần — nghỉ một tuần rồi quay lại thấy kho buổi cũ trống là
+  mất đúng phần so tiến bộ. `keepStorage()` trong `lib/session.ts` xin trình duyệt giữ lại
+  ngay lúc mở trang.
+- **Ghi hỏng thì phải nói ra.** `saveSession` và `saveArchive` trả về `false` khi trình
+  duyệt chặn lưu trữ, và giao diện báo đỏ ngay đầu chỗ chấm. Nuốt lỗi ở đây nghĩa là thầy
+  chấm ba mươi em suốt bốn mươi lăm phút rồi mở bảng ưu tiên ra thấy trống trơn — kiểu hỏng
+  tệ nhất sản phẩm này có thể mắc.
+
 ## 4. Thầy quyết định, Catch chỉ xếp thứ tự
 
 Catch không nói với học sinh. Catch nói với giáo viên, và giáo viên có toàn quyền

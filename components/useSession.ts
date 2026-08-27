@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  emptySession, loadArchive, loadSession, saveArchive, saveSession,
+  emptySession, keepStorage, loadArchive, loadSession, saveArchive, saveSession,
   type Entry, type Session,
 } from '@/lib/session';
 
@@ -19,11 +19,15 @@ export function useSession() {
   const [session, setSession] = useState<Session>(() => emptySession());
   const [archive, setArchive] = useState<Session[]>([]);
   const [ready, setReady] = useState(false);
+  /** Máy có thật sự lưu được không. Chỉ chuyển sang false khi một lần ghi hỏng
+   *  thật — đoán trước bằng cách ghi thử rồi cảnh báo là dựng chuyện doạ thầy. */
+  const [storageOk, setStorageOk] = useState(true);
 
   useEffect(() => {
     setSession(loadSession());
     setArchive(loadArchive());
     setReady(true);
+    void keepStorage();
 
     // Thầy mở bảng ưu tiên ở tab khác thì hai tab phải khớp nhau
     const onStorage = (e: StorageEvent) => {
@@ -38,7 +42,7 @@ export function useSession() {
   const update = useCallback((next: Session | ((s: Session) => Session)) => {
     setSession((cur) => {
       const value = typeof next === 'function' ? next(cur) : next;
-      saveSession(value);
+      if (!saveSession(value)) setStorageOk(false);
       return value;
     });
   }, []);
@@ -68,11 +72,11 @@ export function useSession() {
       if (cur.entries.length === 0) return cur;
       setArchive((old) => {
         const next = [...old.filter((s) => s.id !== cur.id), cur];
-        saveArchive(next);
+        if (!saveArchive(next)) setStorageOk(false);
         return next;
       });
       const fresh = emptySession(cur.className);
-      saveSession(fresh);
+      if (!saveSession(fresh)) setStorageOk(false);
       return fresh;
     });
   }, []);
@@ -91,15 +95,14 @@ export function useSession() {
     if (!b || b.version !== 1) return { ok: false, why: 'Tệp này không phải bản lưu của Catch.' };
     if (!b.current || !Array.isArray(b.current.entries)) return { ok: false, why: 'Tệp lưu hỏng — thiếu buổi hiện tại.' };
     const nextArchive = Array.isArray(b.archive) ? b.archive.filter((s) => Array.isArray(s?.entries)) : [];
-    saveSession(b.current);
-    saveArchive(nextArchive);
+    if (!saveSession(b.current) || !saveArchive(nextArchive)) setStorageOk(false);
     setSession(b.current);
     setArchive(nextArchive);
     return { ok: true };
   }, []);
 
   return {
-    session, archive, ready, update,
+    session, archive, ready, storageOk, update,
     addEntry, patchEntry, removeEntry, clearEntries,
     finishSession, exportBackup, importBackup,
   };

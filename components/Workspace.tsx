@@ -32,7 +32,7 @@ const LOI_TIENG_VIET: Record<string, string> = {
 type Phase = 'setup' | 'working' | 'done';
 
 export function Workspace() {
-  const { session, ready, update, addEntry } = useSession();
+  const { session, ready, storageOk, update, addEntry } = useSession();
   const [skill, setSkill] = useState<Skill | null>(null);
   const [source, setSource] = useState<PickedSource | null>(null);
   const [phase, setPhase] = useState<Phase>('setup');
@@ -111,6 +111,17 @@ export function Workspace() {
     // Lúc soi thì cần cả bề ngang cho khung hình và cột lỗi; lúc chuẩn bị thì
     // một cột hẹp đọc dễ hơn nhiều.
     <div className={`mx-auto transition-[max-width] duration-300 ${reviewing ? 'max-w-6xl' : 'max-w-2xl'}`}>
+      {/* Trình duyệt chặn lưu trữ thì thầy phải biết NGAY, không phải lúc hết buổi
+          mở bảng ưu tiên ra thấy trống. Câu này nói luôn đường thoát. */}
+      {!storageOk && (
+        <p role="alert" className="mb-4 rounded-2xl border border-danger/35 bg-danger/[0.08] px-4 py-3.5 text-sm leading-relaxed text-danger">
+          <strong className="font-semibold">Máy này không lưu được buổi học.</strong>{' '}
+          Trình duyệt đang chặn bộ nhớ cục bộ — thường là do đang ở chế độ ẩn danh. Catch vẫn
+          chấm bình thường, nhưng đóng tab là mất hết. Chấm xong em nào thì{' '}
+          <strong className="font-semibold">chụp màn hình hoặc ghi ra giấy ngay</strong>.
+        </p>
+      )}
+
       <SessionBar session={session} ready={ready} onChange={(patch) => update((s) => ({ ...s, ...patch }))} />
 
       <div className="mt-8">
