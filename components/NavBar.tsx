@@ -32,10 +32,11 @@ export function NavBar() {
   const onBoard = path === '/session';
 
   return (
-    /* Chỉ ghim từ màn hình vừa trở lên. Trên điện thoại thanh này xuống bốn dòng
-       và chiếm một phần tư chiều cao — ghim cố định ở đó là lấy mất chỗ của thứ
-       thầy đang thực sự đọc. Để nó cuộn đi như phần đầu trang bình thường. */
-    <header className="z-40 border-b border-line/70 bg-abyss/80 backdrop-blur-md sm:sticky sm:top-0">
+    /* Ghim ở mọi cỡ màn hình. Bản trước chỉ ghim từ sm trở lên, và trên điện thoại
+       thầy cuộn xuống giữa màn hình soi là mất luôn đường về — đo được: logo nằm ở
+       y = -590, ngoài khung nhìn. Nên thay vì bỏ ghim, thanh được làm gọn lại: nhãn
+       chữ rút ngắn, phần chữ của ô đăng nhập ẩn đi, còn hai dòng thay vì bốn. */
+    <header className="sticky top-0 z-40 border-b border-line/70 bg-abyss/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-2.5 sm:px-8">
         <Brand />
 
@@ -68,7 +69,9 @@ export function NavBar() {
             <SyncBadge state={syncState} user={user} onSignIn={signIn} onSignOut={signOutTeacher} />
           )}
           <span className="text-sm text-mist" aria-live="polite">
-            {ready ? (n === 0 ? 'chưa chấm em nào' : `${n} em đã chấm`) : ' '}
+            {ready ? (n === 0
+              ? <><span className="sm:hidden">chưa chấm</span><span className="hidden sm:inline">chưa chấm em nào</span></>
+              : <>{n} em<span className="hidden sm:inline"> đã chấm</span></>) : ' '}
           </span>
 
           {/* Đang đứng ở bảng ưu tiên rồi thì đường ra là quay về chỗ chấm,
@@ -85,7 +88,8 @@ export function NavBar() {
               href="/session"
               className="flex items-center gap-1.5 rounded-lg border border-aqua/35 bg-aqua/[0.08] px-3 py-1.5 text-sm font-medium text-aqua transition hover:bg-aqua/[0.14]"
             >
-              Thứ tự ưu tiên
+              <span className="sm:hidden">Ưu tiên</span>
+              <span className="hidden sm:inline">Thứ tự ưu tiên</span>
               <ArrowRightIcon aria-hidden className="size-3.5" />
             </Link>
           )}

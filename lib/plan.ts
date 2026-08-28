@@ -3,25 +3,15 @@ import { classProgress } from './progress';
 import { CLASS_WIDE, commonFaults, worstSeverity, type Session } from './session';
 import { formatDate } from './time';
 
-/** Nội dung nhắc cho buổi sau, dạng chữ trơn để nhét vào một sự kiện lịch.
+/** Nội dung nhắc buổi sau, dạng chữ trơn cho một sự kiện lịch.
  *
- *  ⚠️ Luật cứng của tệp này: **không tên em, không lỗi của từng em.**
- *
- *  Không phải cẩn thận thừa. Sự kiện lịch rò rỉ dễ hơn hẳn Firestore — lịch được
- *  chia sẻ trong Workspace của trường, đồng bộ xuống điện thoại, hiện ra cho
- *  người được uỷ quyền, và lọt vào lời mời họp. Một dòng "Em Nguyễn Văn A: vùng
- *  vẫy, nguy hiểm ở chỗ sâu" nằm trong lịch là hồ sơ đánh giá một đứa trẻ đặt ở
- *  chỗ không ai kiểm soát được nữa.
- *
- *  Nên ở đây chỉ có **con số mức lớp** và **việc cần dạy chung**. Muốn biết em
- *  nào thì mở Catch — chỗ có luật bảo mật đứng gác.
- *
- *  `commonFaults()` trả về cả mảng `students` chứa tên em. Chỗ này chỉ được dùng
- *  `students.length`. Có phép thử canh đúng điều đó trong test/plan.test.ts. */
+ *  ⚠️ Luật cứng: KHÔNG tên em, KHÔNG lỗi của từng em. Lịch rò rỉ dễ hơn hẳn
+ *  Firestore — chia sẻ trong Workspace trường, đồng bộ xuống điện thoại, lọt vào
+ *  lời mời họp. `commonFaults()` có trả về mảng tên em; chỗ này chỉ được dùng
+ *  `students.length`, có phép thử canh trong test/plan.test.ts. */
 export type Plan = { title: string; description: string };
 
-/** Bao nhiêu lỗi dạy chung đưa vào nhắc. Ba là hết chỗ đọc trên màn hình khoá
- *  điện thoại — thầy liếc lịch trước giờ dạy chứ không ngồi đọc. */
+/** Ba là hết chỗ đọc trên màn hình khoá điện thoại. */
 const MAX_CLASS_WIDE_FAULTS = 3;
 
 export function nextSessionPlan(

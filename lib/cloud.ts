@@ -6,17 +6,9 @@ import {
 import { getDb } from './firebase.client';
 import type { Session } from './session';
 
-/** Buổi học trên Firestore.
- *
- *      users/{uid}/sessions/{sessionId}
- *
- *  Mỗi buổi một tài liệu, không nhét cả kho vào một chỗ: buổi đang chấm bị ghi
- *  lại liên tục, còn buổi cũ thì gần như không đụng tới. Tách ra thì một lần
- *  thêm em không kéo theo hai mươi buổi cũ đi qua đường truyền của thầy.
- *
- *  `closedAt` phân biệt buổi đang chấm với buổi đã đóng — đúng một buổi được
- *  phép để trống trường này. Không dùng cờ `isCurrent` vì hai máy cùng bật cờ
- *  là hỏng, còn mốc thời gian thì so được. */
+/** users/{uid}/sessions/{sessionId} — mỗi buổi một tài liệu.
+ *  `closedAt` phân biệt buổi đang chấm với buổi đã đóng; không dùng cờ isCurrent
+ *  vì hai máy cùng bật cờ là hỏng, còn mốc thời gian thì so được. */
 export type CloudSession = Session & { closedAt: number | null; updatedAt: number };
 
 const KEEP = 20;
@@ -47,20 +39,11 @@ export function dropSession(uid: string, id: string): Promise<void> {
   return col ? deleteDoc(doc(col, id)) : Promise.resolve();
 }
 
-/** `strayOpen` — những buổi còn để ngỏ ngoài buổi đang dùng.
- *
- *  Sinh ra khi thầy mở Catch trên hai máy cùng lúc: mỗi máy tự dựng một buổi mới
- *  và cùng ghi lên với `closedAt = null`. Không dọn thì chúng nằm lại mãi, không
- *  máy nào hiện ra — mà một trong số đó có thể đang chứa các em thầy vừa chấm.
- *  Chỗ gọi phải quyết: buổi rỗng thì xoá, buổi có em thì đóng lại cho vào kho.
- *  Vứt im lặng một buổi có tên trẻ trong đó là chuyện không được phép. */
+/** `strayOpen`: buổi để ngỏ mồ côi, sinh ra khi thầy mở Catch trên hai máy.
+ *  Chỗ gọi phải dọn — rỗng thì xoá, có em thì đóng lại cho vào kho. */
 export type CloudState = { current: Session | null; archive: Session[]; strayOpen: Session[] };
 
-/** Nghe mọi thay đổi, kể cả từ máy khác của cùng thầy.
- *
- *  Firestore trả về từ bộ đệm trước rồi mới tới bản trên máy chủ, nên màn hình
- *  không đợi mạng. `fromCache` để chỗ gọi biết dữ liệu đang là bản chờ đồng bộ
- *  hay đã lên tới nơi. */
+/** Nghe thay đổi, kể cả từ máy khác. `fromCache` cho biết đã lên tới máy chủ chưa. */
 export function watchSessions(
   uid: string,
   cb: (state: CloudState, fromCache: boolean) => void,

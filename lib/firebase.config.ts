@@ -1,24 +1,8 @@
-/** Cấu hình Firebase của dự án `catch-64526`.
- *
- *  Ghi thẳng vào mã nguồn, có chủ ý. Ba lý do, theo thứ tự quan trọng:
- *
- *  1. **Đây không phải bí mật.** Google thiết kế cụm này để lộ ra trình duyệt —
- *     nó chỉ định danh dự án. Thứ chặn người lạ là `firestore.rules`, đã thử
- *     trên emulator: hai thầy khác nhau đọc hay ghi vào dữ liệu của nhau đều
- *     `permission-denied`. Giấu mấy dòng này đi không thêm lớp an toàn nào, vì
- *     bất kỳ ai mở DevTools cũng đọc được chúng trong gói JavaScript.
- *  2. **Next nướng `NEXT_PUBLIC_*` vào gói JavaScript LÚC BUILD.** AI Studio tự
- *     dựng lại app từ kho mã và chỉ đặt sẵn `GEMINI_API_KEY` — không có chỗ nào
- *     truyền sáu biến này vào lúc đó. Để trống thì bản deploy mất đồng bộ trong
- *     im lặng, mà triệu chứng lại giống hệt "chưa đăng nhập". Kiểu hỏng khó tìm nhất.
- *  3. Biến môi trường vẫn đè lên được, để ai fork về trỏ sang dự án của họ.
- *
- *  Bí mật THẬT của Catch vẫn là `GEMINI_API_KEY`, và nó ở máy chủ, không bao giờ
- *  đi xuống trình duyệt.
- *
- *  Việc nên làm trong Google Cloud Console: khoá `apiKey` này theo HTTP referrer,
- *  chỉ cho tên miền của Catch. Không phải để giữ bí mật — mà để người khác không
- *  mượn hạn mức Firebase của dự án này. */
+/** Cấu hình dự án catch-64526. Ghi cứng có chủ ý: cụm này công khai theo thiết kế
+ *  của Google (firestore.rules mới là thứ chặn người lạ), mà Next nướng
+ *  NEXT_PUBLIC_* vào gói JS lúc BUILD — AI Studio dựng lại từ kho mã và chỉ đặt sẵn
+ *  GEMINI_API_KEY, để trống thì bản deploy mất đồng bộ trong im lặng.
+ *  Nên khoá apiKey theo HTTP referrer trong Cloud Console. */
 export const DEFAULTS = {
   apiKey: 'AIzaSyC6WilJSncRV1Je7Y_hULr0tjCIASYCUC4',
   authDomain: 'catch-64526.firebaseapp.com',
@@ -31,9 +15,7 @@ export const DEFAULTS = {
 
 export type FirebaseConfig = { -readonly [K in keyof typeof DEFAULTS]: string };
 
-/** Biến môi trường đè lên cấu hình mặc định — nhưng chuỗi rỗng thì không tính là
- *  đè. Một biến khai báo mà bỏ trống trong lần deploy vội là chuyện thường, và
- *  nó phải cho ra bản chạy được chứ không phải một `apiKey` rỗng. */
+/** Chuỗi rỗng KHÔNG tính là đè — biến bỏ trống phải cho ra bản chạy được. */
 export function resolveConfig(env: Record<string, string | undefined>): FirebaseConfig {
   const pick = (key: string, fallback: string) => {
     const v = env[key];

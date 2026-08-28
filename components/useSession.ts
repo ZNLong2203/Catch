@@ -13,27 +13,15 @@ const KEYS = ['catch:session:v1', 'catch:archive:v1'];
 
 export type Backup = { version: 1; exportedAt: string; current: Session; archive: Session[] };
 
-/** Buổi học ở đâu, và thầy đang được hứa điều gì.
- *
- *  Ba trạng thái này phải nói thật ra giao diện, vì lời hứa của mỗi cái khác hẳn nhau:
- *
- *  · `off`     — chưa cấu hình Firebase. Chỉ nằm trong trình duyệt máy này.
- *  · `device`  — đã lên Firestore, nhưng danh tính là tài khoản ẩn danh gắn với
- *                trình duyệt này. Xoá dữ liệu duyệt web là mất đường về tài khoản
- *                đó. KHÔNG được nói với thầy là "đã an toàn trên đám mây".
- *  · `account` — đã đăng nhập Google. Đây mới là lúc buổi học thật sự theo người,
- *                mở máy khác vẫn còn. */
+/** `off` chưa cấu hình Firebase · `device` ẩn danh, dữ liệu đã lên Firestore nhưng
+ *  đường về nằm trong trình duyệt này · `account` đã đăng nhập, theo người.
+ *  Giao diện gọi `device` là "chỉ máy này", cố ý không dùng chữ "đám mây". */
 export type SyncState = 'off' | 'device' | 'account';
 
-/** Gộp nhiều lần gõ thành một lần ghi.
- *
- *  Thầy gõ tên lớp "4A" là ba lần đổi state. Ghi thẳng lên Firestore từng lần là
- *  ba lượt ghi tính tiền, trên đường truyền 3G ở bờ hồ. Chỉ hoãn phần siêu dữ
- *  liệu — thêm hay xoá một em là hành động dứt khoát, ghi ngay. */
+/** Gộp nhiều lần gõ thành một lần ghi. Thêm/xoá em thì ghi ngay. */
 const DEBOUNCE_MS = 600;
 
-/** Số buổi cũ giữ lại — khớp với KEEP trong lib/session.ts. Đủ cho một khoá phổ
- *  cập bơi, và là hạn lưu trữ mà docs/SAFETY.md hứa với phụ huynh. */
+/** Khớp KEEP trong lib/session.ts. Là hạn lưu trữ docs/SAFETY.md hứa. */
 const KEEP = 20;
 
 export function useSession() {

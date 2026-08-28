@@ -8,15 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { fromISO, formatDate, formatDateRelative, toISO } from '@/lib/time';
 
-/** Chọn ngày buổi học.
- *
- *  Trước đây là <input type="date">: mỗi trình duyệt vẽ một kiểu, trên máy
- *  thầy thì ra ô lịch nền xám lạc khỏi cả trang. Lịch này do mình vẽ nên
- *  giống nhau ở mọi nơi.
- *
- *  Không cho chọn ngày mai trở đi — buổi chưa xảy ra thì không có gì để chấm,
- *  và cái duy nhất một ngày tương lai làm được là làm hỏng thứ tự khi so tiến
- *  bộ giữa các buổi. */
+/** Chọn ngày buổi học. Không cho chọn ngày mai trở đi: buổi chưa xảy ra thì không
+ *  có gì để chấm, và một ngày tương lai gõ nhầm làm sai thứ tự khi so tiến bộ. */
 export function DatePicker({
   value, onChange, className, direction = 'past', ready = true,
 }: {

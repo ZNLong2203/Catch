@@ -5,13 +5,9 @@ import { CloudIcon, CloudOffIcon, LoaderIcon } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import type { SyncState } from './useSession';
 
-/** Buổi học đang nằm ở đâu — nói đúng, đừng nói cho êm tai.
- *
- *  Chỗ dễ nói dối nhất trong cả sản phẩm là ở đây. Khi mới chỉ có tài khoản ẩn
- *  danh thì dữ liệu ĐÃ nằm trên Firestore thật, nhưng đường về nó là một danh
- *  tính lưu trong trình duyệt này — xoá dữ liệu duyệt web là mất. Gọi trạng thái
- *  đó là "đã lưu trên đám mây" thì thầy sẽ tin và không sao lưu gì nữa, rồi mất
- *  cả khoá học. Nên nó được gọi đúng tên: "chỉ máy này". */
+/** Chỗ dễ nói dối nhất sản phẩm. Tài khoản ẩn danh có dữ liệu thật trên Firestore,
+ *  nhưng đường về nó nằm trong trình duyệt này — xoá dữ liệu duyệt web là mất. Gọi
+ *  là "đã lưu trên đám mây" thì thầy tin và không sao lưu nữa. Nên gọi đúng tên. */
 export function SyncBadge({
   state, user, onSignIn, onSignOut,
 }: {
@@ -26,7 +22,7 @@ export function SyncBadge({
     return (
       <span className="flex items-center gap-1.5 text-xs text-dim" title="Chưa cấu hình Firebase — buổi học chỉ nằm trong trình duyệt này">
         <CloudOffIcon aria-hidden className="size-3.5" />
-        chỉ máy này
+        <span className="hidden sm:inline">chỉ máy này</span>
       </span>
     );
   }
@@ -37,7 +33,7 @@ export function SyncBadge({
       <span className="flex items-center gap-2">
         <span className="flex items-center gap-1.5 text-xs text-calm" title={`Đang đồng bộ với ${who}`}>
           <CloudIcon aria-hidden className="size-3.5" />
-          <span className="max-w-[10rem] truncate">{who}</span>
+          <span className="hidden max-w-[10rem] truncate sm:inline">{who}</span>
         </span>
         <button
           type="button"
@@ -62,7 +58,7 @@ export function SyncBadge({
       {busy
         ? <LoaderIcon aria-hidden className="size-3.5 animate-spin" />
         : <CloudOffIcon aria-hidden className="size-3.5" />}
-      {busy ? 'đang mở…' : 'chỉ máy này — đăng nhập'}
+      <span className="hidden sm:inline">{busy ? 'đang mở…' : 'chỉ máy này — đăng nhập'}</span>
     </button>
   );
 }
